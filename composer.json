@@ -1,0 +1,19 @@
+{
+    "name": "cti/zend-framework-2",
+    "description": "Default Zend Framework 2 application",
+    "license": "BSD-3-Clause",
+    "keywords": [
+        "framework",
+        "zf2"
+    ],
+    "homepage": "http://www.ctidigital.com/",
+    "minimum-stability": "alpha",
+    "require": {
+        "php": ">=5.3.3",
+        "zendframework/zendframework": "2.*",
+        "doctrine/doctrine-module": "dev-master",
+        "doctrine/doctrine-orm-module": "0.*",
+        "doctrine/data-fixtures": "dev-master",
+        "zendframework/zend-developer-tools": "dev-master"
+    }
+}

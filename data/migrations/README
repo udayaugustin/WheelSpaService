@@ -1,0 +1,4 @@
+Temp setup:
+
+Use ./vendor/bin/doctrine-module migration:[command] --configuration=module/CTI/Config/migrations-config.xml
+to generate migrations

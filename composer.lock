@@ -1,0 +1,67 @@
+{
+    "hash": "f7dff0ca0a1527b7205908c7a6875048",
+    "packages": [
+        {
+            "package": "doctrine/common",
+            "version": "2.3.0"
+        },
+        {
+            "package": "doctrine/data-fixtures",
+            "version": "dev-master",
+            "alias-pretty-version": "1.0.x-dev",
+            "alias-version": "1.0.9999999.9999999-dev"
+        },
+        {
+            "package": "doctrine/data-fixtures",
+            "version": "dev-master",
+            "source-reference": "50e7e644984f17038224f6fcd02c2b7c20147980",
+            "commit-date": "1357391152"
+        },
+        {
+            "package": "doctrine/dbal",
+            "version": "2.3.2"
+        },
+        {
+            "package": "doctrine/doctrine-module",
+            "version": "dev-master",
+            "source-reference": "31d75b3af6a9fbb1ba0cad3d8023d030f78c33c8",
+            "commit-date": "1358429741"
+        },
+        {
+            "package": "doctrine/doctrine-orm-module",
+            "version": "0.5.6"
+        },
+        {
+            "package": "doctrine/migrations",
+            "version": "v1.0-ALPHA1"
+        },
+        {
+            "package": "doctrine/orm",
+            "version": "2.3.2"
+        },
+        {
+            "package": "symfony/console",
+            "version": "v2.2.0-BETA2"
+        },
+        {
+            "package": "zendframework/zend-developer-tools",
+            "version": "dev-master",
+            "source-reference": "e930bd2feaf13e046e6896d18d4218e31c3ddaf1",
+            "commit-date": "1351428639"
+        },
+        {
+            "package": "zendframework/zendframework",
+            "version": "2.0.6"
+        }
+    ],
+    "packages-dev": null,
+    "aliases": [
+
+    ],
+    "minimum-stability": "alpha",
+    "stability-flags": {
+        "doctrine/doctrine-module": 20,
+        "doctrine/data-fixtures": 20,
+        "zendframework/zend-developer-tools": 20
+    }
+}
