@@ -182,7 +182,7 @@ class UserTable extends AbstractTableGateway {
                     );
                     if($params->password!=''){
                         $password = sha1($params->servPass . $configResult["password"]["salt"]);
-                        $data->server_password = $password;
+                        $data->password = $password;
                     }
                     $updateResult = $this->update($data,array('user_id'=>$params->userId));
                     if($updateResult > 0){
@@ -205,6 +205,44 @@ class UserTable extends AbstractTableGateway {
             $response['user-details'] = 'Username already exists.';
         }
         return $response;
+    }
+
+    // Web Model
+    public function loginProcessDetails($params){
+        $alertContainer = new Container('alert');
+        $logincontainer = new Container('credo');
+        $config = new \Zend\Config\Reader\Ini();
+        $configResult = $config->fromFile(CONFIG_PATH . '/custom.config.ini');
+        \Zend\Debug\Debug::dump($params);die;
+        if(isset($params['userName']) && trim($params['userName'])!="" && trim($params['password'])!=""){
+            $password = sha1($params['password'] . $configResult["password"]["salt"]);
+            $dbAdapter = $this->adapter;
+            $sql = new Sql($dbAdapter);
+            $sQuery = $sql->select()->from(array('ud' => 'user_details'))
+                    ->join(array('r' => 'roles'), 'ud.role_id = r.role_id', array('role_code'))
+				    ->where(array('ud.email' => $params['userName'], 'ud.password' => $password));
+            $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+            $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+
+            if($rResult) {
+                        $logincontainer->userId = $rResult->user_id;
+                        $logincontainer->roleId = $rResult->role_id;
+                        $logincontainer->roleCode = $rResult->role_code;
+                        $logincontainer->userName = ucwords($rResult->user_name);
+                        $logincontainer->userEmail = ucwords($rResult->email);
+                        if($rResult->role_code != 'admin'){
+                            return '/login';
+                        }else{
+                            return '/user';
+                        }
+            }else {
+                $alertContainer->alertMsg = 'The email id or password that you entered is incorrect';
+                return '/login';
+            }
+        }else {
+            $alertContainer->alertMsg = 'The email id or password that you entered is incorrect';
+            return '/login';
+        }
     }
 
 }

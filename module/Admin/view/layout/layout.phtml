@@ -7,13 +7,10 @@ $roleCode = $sessionLogin->roleCode;
 $userName = $sessionLogin->userName;
 // \Zend\Debug\Debug::dump($roleCode);die;
 
-// $userMenu = "";
-// $userMenu.="<li id='nav-main-item'><a id='global-config' class='nav-main-link' href=". $this->url('global-config', array('action' => 'index')) ."><span class='nav-main-link-name'>Global Config</span></a></li>";
-// $userMenu.="<li id='nav-main-item'><a id='user' class='nav-main-link' href=". $this->url('user', array('action' => 'index')) ."><span class='nav-main-link-name'>User</span></a></li>";
-// $userMenu.="<li id='nav-main-item'><a id='facilities' class='nav-main-link' href=". $this->url('facilities', array('action' => 'index')) ."><span class='nav-main-link-name'>Facilities</span></a></li>";
-
 // $tyreMenu = "";
-// $tyreMenu.="<li id='nav-main-item'><a id='Tyre' class='nav-main-link' href=". $this->url('Tyre', array('action' => 'index')) ."><span class='nav-main-link-name'><i class='nav-main-link-icon si si-notebook'></i> Tyre Data</span></a></li>";
+// $tyreMenu.="<li id='nav-main-item'><a id='global-config' class='nav-main-link' href=". $this->url('global-config', array('action' => 'index')) ."><span class='nav-main-link-name'>Global Config</span></a></li>";
+// $tyreMenu.="<li id='nav-main-item'><a id='user' class='nav-main-link' href=". $this->url('user', array('action' => 'index')) ."><span class='nav-main-link-name'>User</span></a></li>";
+// $tyreMenu.="<li id='nav-main-item'><a id='facilities' class='nav-main-link' href=". $this->url('facilities', array('action' => 'index')) ."><span class='nav-main-link-name'>Facilities</span></a></li>";
 
 ?>
 
@@ -94,8 +91,8 @@ $userName = $sessionLogin->userName;
         <div class="bg-header-dark">
           <div class="content-header bg-white-10">
             <!-- Logo -->
-            <a class="link-fx font-w600 font-size-md text-white" href="" style=" font-size: 20px; ">
-              <span class="text-white">Automobile</span>&nbsp;<span class="text-white-75">Service</span>
+            <a class="link-fx font-w600 font-size-md text-white" href="" style=" font-size: 25px; ">
+              <span class="text-dark">Automobile</span>&nbsp;<span class="text-blue-75">Service</span>
             </a>
             <!-- END Logo -->
           </div>
@@ -120,14 +117,10 @@ $userName = $sessionLogin->userName;
                   <span class="nav-main-link-name ">Manage</span>
                 </a>
                 <ul class="nav-main-submenu">
-                    <?php echo $userMenu;?>
+                    <?php echo $tyreMenu;?>
                 </ul>
               </li>
               <?php } ?>
-              <li class="nav-main-heading" style="padding:5px;"></li>
-              <?php echo $tyreMenu;?>
-            
-
           </ul>
         </div>
         <!-- END Side Navigation -->
@@ -162,7 +155,7 @@ $userName = $sessionLogin->userName;
                       <i class="far fa-fw fa-user mr-1"></i> Edit Profile
                   </a>
                   <div role="separator" class="dropdown-divider"></div>
-                  <a class="dropdown-item"  href="login/logout">
+                  <a class="dropdown-item"  href="/logout">
                       <i class="far fa-fw fa-arrow-alt-circle-left mr-1"></i> Sign Out
                   </a>
                   
@@ -249,15 +242,15 @@ $userName = $sessionLogin->userName;
       str=$(location).attr('pathname');
       splitsUrl=str.split("/",4);
 
-      if(splitsUrl[1]=='facilities' || splitsUrl[1]=='user' || splitsUrl[1]=='Tyre' || splitsUrl[1]=='global-config' )
+      if(splitsUrl[1]=='facilities' || splitsUrl[1]=='user' || splitsUrl[1]=='recency' || splitsUrl[1]=='global-config' )
       {
-        if(splitsUrl[1] != 'Tyre'){
-          $('#Tyre-menu').removeClass('open');
+        if(splitsUrl[1] != 'recency'){
+          $('#recency-menu').removeClass('open');
           $('#manage').addClass('open');
           $('#'+splitsUrl[1]).addClass('active');
-        }else if(splitsUrl[1] == 'Tyre'){
+        }else if(splitsUrl[1] == 'recency'){
           $('#manage').removeClass('open');
-          $('#Tyre-menu').addClass('open');
+          $('#recency-menu').addClass('open');
           $('#'+splitsUrl[1]).addClass('active');
         }
       }

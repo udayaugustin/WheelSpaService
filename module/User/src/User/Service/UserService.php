@@ -27,19 +27,29 @@ class UserService {
         $userDb = $this->sm->get('UserTable');
         return $userDb->userLoginDetailsInApi($params);
     }
+    
     public function getAllUserListAPI($params)
     {
         $userDb = $this->sm->get('UserTable');
         return $userDb->fetchAllUserListAPI($params);
     }
+
     public function getUserDetailsByIdAPI($params)
     {
         $userDb = $this->sm->get('UserTable');
         return $userDb->fetchUserDetailsByIdAPI($params);
     }
+
     public function updateExistsUserDetails($params)
     {
         $userDb = $this->sm->get('UserTable');
         return $userDb->updateUserDetails($params);
+    }
+
+    // Web service
+    public function loginProcess($params)
+    {
+        $userDb = $this->sm->get('UserTable');
+        return $userDb->loginProcessDetails($params);
     }
 }
