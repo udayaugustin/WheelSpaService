@@ -28,12 +28,6 @@ class UserService {
         return $userDb->userLoginDetailsInApi($params);
     }
     
-    public function getAllUserListAPI($params)
-    {
-        $userDb = $this->sm->get('UserTable');
-        return $userDb->fetchAllUserListAPI($params);
-    }
-
     public function getUserDetailsByIdAPI($params)
     {
         $userDb = $this->sm->get('UserTable');

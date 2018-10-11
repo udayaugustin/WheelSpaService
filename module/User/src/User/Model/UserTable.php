@@ -29,11 +29,11 @@ class UserTable extends AbstractTableGateway {
         $queryStr = $sql->getSqlStringForSqlObject($query);
         $rResult=$dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         
-        if(isset($rResult->user_status) && $rResult->user_status == 'active'){
+        if(isset($rResult->user_id) && $rResult->user_id !=''){
             //Get Random string for authToken
-            $authToken = $common->generateRandomString();;
+            $authToken = $common->generateRandomString();
         
-            if(isset($rResult->user_id) && $rResult->user_id!='') {
+            if(isset($rResult->user_status) && $rResult->user_status !='inactive') {
                 
                 $data = array(
                     'auth_token'=>$authToken
@@ -51,17 +51,18 @@ class UserTable extends AbstractTableGateway {
             }
             else {
                 $response['status']='failed';
-                $response['message']='Please check your login credentials';
+                $response['message']='User status is inactive';
             }
         }else{
             $response['status']='failed';
-            $response['message']='User status is inactive';
+            $response['message']='Please check your login credentials';
         }
         return $response;
     }
     
     public function addUserDetailsAPI($params)
     {   
+        $common = new CommonService;
         if(isset($params->userName) && trim($params->userName)!="")
         {
             $dbAdapter = $this->adapter;
@@ -71,7 +72,8 @@ class UserTable extends AbstractTableGateway {
                         ->where(array('username'=>$params->userName));
             $queryStr = $sql->getSqlStringForSqlObject($query);
             $rResult=$dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-            
+            $authToken = $common->generateRandomString();
+
             if(!isset($rResult->user_id) && trim($rResult->user_id) == ""){
                 $config = new \Zend\Config\Reader\Ini();
                 $configResult = $config->fromFile(CONFIG_PATH . '/custom.config.ini');
@@ -80,13 +82,20 @@ class UserTable extends AbstractTableGateway {
                     'username' => $params->userName,
                     'role_id' => $params->roleId,
                     'name' => $params->name,
-                    'password' => $password,
+                    'password' => $password,    
                     'phone' => $params->mobile,
+                    'user_dob' => $common->dbDateFormat($params['dob']),
+                    'pincode' => $params['pincode'],
+                    'state' => $params['state'],
+                    'city' => $params['city'],
+                    'street_address' => $params['address'],
+                    'auth_token' => $authToken,
                 );
                 $this->insert($data);
                 $lastInsertedId = $this->lastInsertValue;
                 if($lastInsertedId > 0){
                     $response['status'] = 'success';
+                    $response['authToken'] = $authToken;
                     $response['message'] ='succesffuly registered';
                 }else{
                     $response['status'] = 'failed';
@@ -100,42 +109,31 @@ class UserTable extends AbstractTableGateway {
         return $response;
     }
 
-    public function fetchAllUserListAPI($params) {
-        $dbAdapter = $this->adapter;
-        $sql = new Sql($dbAdapter);
-
-        $query = $sql->select()->from(array('ud' => 'user_details'))->where(array('auth_token' => $params->authToken,'user_status' => 'active'))
-                    ->join(array('r'=>'roles'),'ud.role_id=r.role_id',array('role_code'));
-        $queryStr = $sql->getSqlStringForSqlObject($query);
-        $rResult=$dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-
-        if(isset($rResult->role_code) && $rResult->role_code =='admin'){
-            $query = $sql->select()->from(array('ud' => 'user_details'))->columns(array('user_id','name','username','phone','user_status'))
-                            ->join(array('r'=>'roles'),'ud.role_id=r.role_id',array('role_code'));
-            $queryStr = $sql->getSqlStringForSqlObject($query);
-            $rResult=$dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            
-            $response['status'] = 'success';
-            $response['user-details'] = $rResult;
-        }else {
-            $response['status']='fail';
-            $response['message']="Don't have privillage to access";
-        }
-        return $response;
-    }
-
     public function fetchUserDetailsByIdAPI($params) {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         if(isset($params->authToken) && trim($params->authToken) != ""){
-            $userQuery = $sql->select()->from(array('ud' => 'user_details'))->columns(array('user_id','name','username','phone','user_status'))
+            $userQuery = $sql->select()->from(array('ud' => 'user_details'))->columns(array('user_id','name','username','phone','user_dob','state','city','street_address','pincode','user_status'))
                             ->join(array('r'=>'roles'),'ud.role_id=r.role_id',array('role_code'))
                             ->where(array('ud.auth_token' => $params->authToken));
             $userQueryStr = $sql->getSqlStringForSqlObject($userQuery);
             $userResult=$dbAdapter->query($userQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
             
-            $response['status'] = 'success';
-            $response['User-details'] = $userResult;
+            if(isset($userResult->role_code) && $userResult->role_code =='admin'){
+                $query = $sql->select()->from(array('ud' => 'user_details'))->columns(array('user_id','name','username','phone','user_dob','state','city','street_address','pincode','user_status'))
+                                ->join(array('r'=>'roles'),'ud.role_id=r.role_id',array('role_code'));
+                $queryStr = $sql->getSqlStringForSqlObject($query);
+                $rResult=$dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+                
+                $response['status'] = 'success';
+                $response['user-details'] = $rResult;
+            }else if( isset($userResult->role_code) ){
+                $response['status'] = 'success';
+                $response['user-details'] = $userResult;
+            }else{
+                $response['status']='fail';
+                $response['message']="User not found";
+            }
         }else {
             $response['status']='fail';
             $response['message']="No data found";
@@ -149,54 +147,40 @@ class UserTable extends AbstractTableGateway {
         $configResult = $config->fromFile(CONFIG_PATH . '/custom.config.ini');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        
+        $common = new CommonService;
         //To check login credentials
         $query = $sql->select()->from(array('ud' => 'user_details'))->where(array('auth_token' => $params->authToken,'user_status' => 'active'))
                         ->join(array('r'=>'roles'),'ud.role_id=r.role_id',array('role_code'));
         $queryStr = $sql->getSqlStringForSqlObject($query);
         $rResult=$dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         
-        //To check dublication mail
-        $checkQuery = $sql->select()->from('user_details')
-                            ->where(array('username'=>$params->userName))
-                            ->where('NOT user_id ='.$params->userId);
-        $checkQueryStr = $sql->getSqlStringForSqlObject($checkQuery);
-        $checkResult=$dbAdapter->query($checkQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-
-        if(!isset($checkResult->user_id) && $checkResult->user_id == ""){
-            if(isset($rResult->role_code) && $rResult->role_code == 'admin'){
-                if(isset($params->userId) && trim($params->userId)!="")
-                {
-                    $data = array(
-                        'username' => $params->userName,
-                        'role_id' => $params->roleId,
-                        'name' => $params->name,
-                        'phone' => $params->mobile,
-                        'user_status' => $params->userStatus,
-                    );
-                    if($params->password!=''){
-                        $password = sha1($params->servPass . $configResult["password"]["salt"]);
-                        $data->password = $password;
-                    }
-                    $updateResult = $this->update($data,array('user_id'=>$params->userId));
-                    if($updateResult > 0){
-                        $response['status'] = 'success';
-                        $response['user-details'] = 'Data updated successfully';
-                    }else{
-                        $response['status'] = 'failed';
-                        $response['user-details'] = 'No updates found';
-                    }
-                }else{
-                    $response['status'] = 'failed';
-                    $response['user-details'] = 'User not found';
-                }
+        if(isset($params->userId) && trim($params->userId)!=""){
+            $data = array(
+                'username' => $params->userName,
+                'role_id' => $params->roleId,
+                'name' => $params->name,
+                'phone' => $params->mobile,
+                'user_dob' => $common->dbDateFormat($params['dob']),
+                'pincode' => $params['pincode'],
+                'state' => $params['state'],
+                'city' => $params['city'],
+                'street_address' => $params['address'],
+            );
+            if($params->password!=''){
+                $password = sha1($params->servPass . $configResult["password"]["salt"]);
+                $data->password = $password;
+            }
+            $updateResult = $this->update($data,array('user_id'=>$params->userId));
+            if($updateResult > 0){
+                $response['status'] = 'success';
+                $response['user-details'] = 'Data updated successfully';
             }else{
                 $response['status'] = 'failed';
-                $response['user-details'] = 'You are not have privillage to update';
+                $response['user-details'] = 'No updates found';
             }
         }else{
             $response['status'] = 'failed';
-            $response['user-details'] = 'Username already exists.';
+            $response['user-details'] = 'User not found';
         }
         return $response;
     }
@@ -213,7 +197,8 @@ class UserTable extends AbstractTableGateway {
             $sql = new Sql($dbAdapter);
             $sQuery = $sql->select()->from(array('ud' => 'user_details'))
                     ->join(array('r' => 'roles'), 'ud.role_id = r.role_id', array('role_code'))
-				    ->where(array('ud.username' => $params['userName'], 'ud.password' => $password));
+                    ->where(array('ud.username' => $params['userName'], 'ud.password' => $password))
+                    ->where(array('r.role_code' => 'admin'));
             $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
             $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
 
@@ -226,10 +211,10 @@ class UserTable extends AbstractTableGateway {
                         if($rResult->role_code != 'admin'){
                             return 'login';
                         }else{
-                            return 'home';
+                            return '/';
                         }
             }else {
-                $alertContainer->alertMsg = 'The email id or password that you entered is incorrect';
+                $alertContainer->alertMsg = "You don't have a privillage to access";
                 return 'login';
             }
         }else {
@@ -241,7 +226,6 @@ class UserTable extends AbstractTableGateway {
     public function fetchUserDetails($parameters) {
 
         $sessionLogin = new Container('credo');
-        $common = new CommonService();
         $aColumns = array('ud.name','r.role_name','ud.username','ud.phone','ud.user_status');
         $orderColumns = array('ud.name','r.role_name','ud.username','ud.phone','ud.user_status');
 
@@ -340,17 +324,17 @@ class UserTable extends AbstractTableGateway {
                 "iTotalDisplayRecords" => $iFilteredTotal,
                 "aaData" => array()
         );
-
         foreach ($rResult as $aRow) {
-
-            $row = array();
-            $row[] = ucwords($aRow['name']);
-            $row[] = ucwords($aRow['role_name']);
-            $row[] = $aRow['username'];
-            $row[] = $aRow['phone'];
-            $row[] = ucwords($aRow['user_status']);
-            $row[] = '<a href="/admin/edit-user/' . base64_encode($aRow['user_id']) . '" class="btn btn-default" style="margin-right: 2px;" title="Edit"><i class="far fa-edit"></i>Edit</a>';
-            $output['aaData'][] = $row;
+            if($aRow['role_id'] == '2'){
+                $row = array();
+                $row[] = ucwords($aRow['name']);
+                $row[] = ucwords($aRow['role_name']);
+                $row[] = $aRow['username'];
+                $row[] = $aRow['phone'];
+                $row[] = ucwords($aRow['user_status']);
+                $row[] = '<a href="/admin/edit-user/' . base64_encode($aRow['user_id']) . '" class="btn btn-default" style="margin-right: 2px;" title="Edit"><i class="far fa-edit"></i>Edit</a>';
+                $output['aaData'][] = $row;
+            }
         }
 
         return $output;
@@ -360,6 +344,7 @@ class UserTable extends AbstractTableGateway {
     {
         if(isset($params['name']) && trim($params['name'])!="")
         {
+            $common = new CommonService;
             $config = new \Zend\Config\Reader\Ini();
             $configResult = $config->fromFile(CONFIG_PATH . '/custom.config.ini');
             $password = sha1($params['password'] . $configResult["password"]["salt"]);
@@ -369,6 +354,11 @@ class UserTable extends AbstractTableGateway {
                 'username' => $params['email'],
                 'password' => $password,
                 'phone' => $params['mobile'],
+                'user_dob' => $common->dbDateFormat($params['dob']),
+                'pincode' => $params['pincode'],
+                'state' => $params['state'],
+                'city' => $params['city'],
+                'street_address' => $params['address'],
                 'user_status' => $params['userStatus']
                 
             );
@@ -393,7 +383,7 @@ class UserTable extends AbstractTableGateway {
     {
         $config = new \Zend\Config\Reader\Ini();
         $configResult = $config->fromFile(CONFIG_PATH . '/custom.config.ini');
-
+        $common = new CommonService;
         if(isset($params['userId']) && trim($params['userId'])!="")
         {
             $data = array(
@@ -401,6 +391,11 @@ class UserTable extends AbstractTableGateway {
                 'role_id' => base64_decode($params['roleName']),
                 'username' => $params['email'],
                 'phone' => $params['mobile'],
+                'user_dob' => $common->dbDateFormat($params['dob']),
+                'pincode' => $params['pincode'],
+                'state' => $params['state'],
+                'city' => $params['city'],
+                'street_address' => $params['address'],
                 'user_status' => $params['userStatus']
             );
             if($params['password']!=''){

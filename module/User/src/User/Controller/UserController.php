@@ -16,13 +16,7 @@ class UserController extends AbstractRestfulController
             return new JsonModel($response);
         }
     }
-    public function getallAction()
-    {
-        $params=$this->getRequest()->getQuery();
-        $userService = $this->getServiceLocator()->get('UserService');
-        $response = $userService->getAllUserListAPI($params);
-        return new JsonModel($response);
-    }
+    
     public function getAction() {
         $params=$this->getRequest()->getQuery();
         $userService = $this->getServiceLocator()->get('UserService');

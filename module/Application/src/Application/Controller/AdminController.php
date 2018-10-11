@@ -32,14 +32,17 @@ class AdminController extends AbstractActionController
         if($session->roleCode == 'admin'){
             $request = $this->getRequest();
             $userService = $this->getServiceLocator()->get('UserService');
+            $adminService = $this->getServiceLocator()->get('AdminService');
             if ($request->isPost()) {
                 $params = $request->getPost();
                 $result = $userService->addUser($params);
                 return $this->redirect()->toUrl("/admin/user");
             }else{
                 $roleResult=$userService->getAllRolesDetails();
+                $stateResult=$adminService->getAllStateDetails();
                 return new ViewModel(array(
                     'roleResult' => $roleResult,
+                    'stateResult' => $stateResult,
                 ));
             }
         }else{
@@ -52,6 +55,7 @@ class AdminController extends AbstractActionController
         $session = new Container('credo');
         if($session->roleCode == 'admin'){
             $userService = $this->getServiceLocator()->get('UserService');
+            $adminService = $this->getServiceLocator()->get('AdminService');
             if($this->getRequest()->isPost())
             {
                 $params=$this->getRequest()->getPost();
@@ -64,9 +68,11 @@ class AdminController extends AbstractActionController
                 if($userId!=''){
                     $roleResult=$userService->getAllRolesDetails();
                     $result=$userService->getUserDetailsById($userId);
+                    $stateResult=$adminService->getAllStateDetails();
                     return new ViewModel(array(
                         'result' => $result,
                         'roleResult' => $roleResult,
+                        'stateResult' => $stateResult,
                     ));
                 }else{
                     return $this->redirect()->toUrl("/admin/user");
@@ -79,24 +85,34 @@ class AdminController extends AbstractActionController
 
     public function editProfileAction()
     {
-        $userService = $this->getServiceLocator()->get('UserService');
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $params = $request->getPost();
-            $userService->updateProfile($params);
-            return $this->redirect()->toUrl("home");
-        }
-        else
-        {
-            $userId=base64_decode( $this->params()->fromRoute('id'));
-            if($userId!=''){
-            $result=$userService->getuserDetailsById($userId);
-            return new ViewModel(array(
-                'result' => $result,
-            ));
-            }else{
-                return $this->redirect()->toUrl("home");
+        $session = new Container('credo');
+        if($session->roleCode == 'admin'){
+            $userService = $this->getServiceLocator()->get('UserService');
+            $adminService = $this->getServiceLocator()->get('AdminService');
+            if($this->getRequest()->isPost())
+            {
+                $params=$this->getRequest()->getPost();
+                $result=$userService->updateUserDetails($params);
+                return $this->redirect()->toUrl('/admin/index');
             }
+            else
+            {
+                $userId=base64_decode( $this->params()->fromRoute('id') );
+                if($userId!=''){
+                    $roleResult=$userService->getAllRolesDetails();
+                    $result=$userService->getUserDetailsById($userId);
+                    $stateResult=$adminService->getAllStateDetails();
+                    return new ViewModel(array(
+                        'result' => $result,
+                        'roleResult' => $roleResult,
+                        'stateResult' => $stateResult,
+                    ));
+                }else{
+                    return $this->redirect()->toUrl("/admin/index");
+                }
+            }
+        }else{
+            return $this->redirect()->toUrl("login");
         }
     }
 

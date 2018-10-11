@@ -3,6 +3,8 @@ use Zend\Session\Container;
 $sessionLogin = new Container('credo');
 $facilityId = array();
 // \Zend\Debug\Debug::dump($result);die;
+use User\Service\CommonService;
+$common = new CommonService;
 ?>
 <div class="bg-body-light">
      <div class="content content-full">
@@ -59,7 +61,36 @@ $facilityId = array();
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label" for="">Mobile<span class="mandatory">*</span></label>
                         <div class="col-sm-4">
-                            <input type="number" value="<?php echo $result['phone']; ?>"  class="form-control isRequired" id="mobile" name="mobile" placeholder="Enter the mobile" title="Please enter the mobile">
+                            <input type="number" value="<?php echo $result['phone']; ?>" class="form-control isRequired" id="mobile" name="mobile" placeholder="Enter the mobile" title="Please enter the mobile">
+                        </div>
+
+                        <label class="col-sm-2 col-form-label" for="">DOB</label>
+                        <div class="col-sm-4">
+                                <input type="text" value="<?php echo $common->humanDateFormat($result['user_dob']); ?>" class="js-datepicker form-control" id="dob" name="dob" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="dd-M-yyyy" value="" placeholder="Enter the dob" title="Please enter the dob" readonly="readonly">
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label" for="">State</label>
+                        <div class="col-sm-4">
+                            <select class="form-control" id="state" name="state" title="Please select the state">
+                                <option value="">--Select--</option>
+                                <?php foreach($stateResult as $state){?>
+                                    <option value="<?php echo $state['state_id']; ?>" <?php echo($result['state'] == $state['state_id'] )?'selected="selected"':''; ?>><?php echo $state['state_name']; ?></option>
+                                <?php } ?>
+                            </select>
+                        </div>
+                       
+                        <label class="col-sm-2 col-form-label" for="">City</label>
+                        <div class="col-sm-4">
+                            <input type="text" value="<?php echo $result['city']; ?>" class="form-control" id="city" name="city" placeholder="Enter the city" title="Please enter the city">
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label" for="">Pincode</label>
+                        <div class="col-sm-4">
+                            <input type="number" value="<?php echo $result['pincode']; ?>" class="form-control" id="pincode" name="pincode" placeholder="Enter the pincode" title="Please enter the pincode">
                         </div>
 
                         <label class="col-sm-2 col-form-label" for="">Status<span class="mandatory">*</span></label>
@@ -68,6 +99,13 @@ $facilityId = array();
                                 <option value="active" <?php echo($result['user_status'] == 'active' )?'selected="selected"':''; ?>>Active</option>
                                 <option value="inactive" <?php echo($result['user_status'] == 'inactive' )?'selected="selected"':''; ?>>Inactive</option>
                             </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label" for="">Address</label>
+                        <div class="col-sm-4">
+                            <textarea class="form-control" id="address" rows="4" cols="50" name="address" placeholder="Enter the address" title="Please enter the address"><?php echo $result['street_address']; ?></textarea>
                         </div>
                     </div>
                     

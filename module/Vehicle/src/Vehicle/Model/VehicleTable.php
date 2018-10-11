@@ -32,47 +32,28 @@ class VehicleTable extends AbstractTableGateway {
                 $data = array(
                     'vehicle_no' => $params->vehicleNo,
                     'user_id' => $params->userId,
+                    'vehicle_name' => $params->vehicleName,
                     'vehicle_brand' => $params->vehicleBrand,
                     'vehicle_model' => $params->vehicleModel,
                     'vehicle_type' => $params->vehicleType,
+                    'vehicle_version' => $params->vehicleVersion,
+                    'year_of_purchase' => $params->yearPurchase,
+                    'km_done' => $params->kmDone,
+                    'avg_drive_per_week' => $params->avgDrive
                 );
                 $this->insert($data);
                 $lastInsertedId = $this->lastInsertValue;
                 if($lastInsertedId > 0){
                     $response['status'] = 'success';
-                    $response->message ='succesffuly added';
+                    $response['message'] ='succesffuly added';
                 }else{
                     $response['status'] = 'failed';
-                    $response->message ='Not added try again';
+                    $response['message'] ='Not added try again';
                 }
             }else{
                 $response['status'] = 'failed';
-                $response->message ='vehicle no already exists';
+                $response['message'] ='vehicle no already exists';
             }
-        }
-        return $response;
-    }
-
-    public function fetchAllVehicleListAPI($params) {
-        $dbAdapter = $this->adapter;
-        $sql = new Sql($dbAdapter);
-
-        $query = $sql->select()->from(array('ud' => 'user_details'))->where(array('auth_token' => $params->authToken,'user_status' => 'active'))
-                                ->join(array('r'=>'roles'),'ud.role_id=r.role_id',array('role_code'));
-        $queryStr = $sql->getSqlStringForSqlObject($query);
-        $rResult=$dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-
-        if(isset($rResult->role_code) && $rResult->role_code =='admin'){
-            $vehicleQuery = $sql->select()->from(array('vd' => 'vehicle_details'))->columns(array('vehicle_id','vehicle_no','vehicle_brand','vehicle_model','vehicle_type'))
-                                ->join(array('ud'=>'user_details'),'ud.user_id=vd.user_id',array('name'));
-            $vehicleQueryStr = $sql->getSqlStringForSqlObject($vehicleQuery);
-            $vehicleResult=$dbAdapter->query($vehicleQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            
-            $response['status'] = 'success';
-            $response['vehicle-details'] = $vehicleResult;
-        }else {
-            $response['status']='fail';
-            $response->message="Don't have privillage to access";
         }
         return $response;
     }
@@ -81,22 +62,35 @@ class VehicleTable extends AbstractTableGateway {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         if(isset($params->authToken) && trim($params->authToken) != ""){
-            $vehicleQuery = $sql->select()->from(array('vd' => 'vehicle_details'))->columns(array('vehicle_id','vehicle_no','vehicle_brand','vehicle_model','vehicle_type'))
-                                ->join(array('ud'=>'user_details'),'ud.user_id=vd.user_id',array('name'))
-                                ->where(array('ud.auth_token' => $params->authToken));
-            $vehicleQueryStr = $sql->getSqlStringForSqlObject($vehicleQuery);
-            $vehicleResult=$dbAdapter->query($vehicleQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-            
-            if(isset($vehicleResult) && $vehicleResult != false){
+            $query = $sql->select()->from(array('ud' => 'user_details'))->where(array('auth_token' => $params->authToken,'user_status' => 'active'))
+                                ->join(array('r'=>'roles'),'ud.role_id=r.role_id',array('role_code'));
+            $queryStr = $sql->getSqlStringForSqlObject($query);
+            $rResult=$dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+            if(isset($rResult->role_code) && $rResult->role_code =='admin'){
+                $vehicleQuery = $sql->select()->from(array('vd' => 'vehicle_details'))->columns(array('*'))
+                                ->join(array('ud'=>'user_details'),'ud.user_id=vd.user_id',array('name'));
+                $vehicleQueryStr = $sql->getSqlStringForSqlObject($vehicleQuery);
+                $vehicleResult=$dbAdapter->query($vehicleQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+                
                 $response['status'] = 'success';
                 $response['vehicle-details'] = $vehicleResult;
             }else{
-                $response['status']='fail';
-                $response->message="No data found for this user";    
+                $vehicleQuery = $sql->select()->from(array('vd' => 'vehicle_details'))->columns(array('*'))
+                                    ->join(array('ud'=>'user_details'),'ud.user_id=vd.user_id',array('name'))
+                                    ->where(array('ud.auth_token' => $params->authToken));
+                $vehicleQueryStr = $sql->getSqlStringForSqlObject($vehicleQuery);
+                $vehicleResult=$dbAdapter->query($vehicleQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+                if(isset($vehicleResult) && $vehicleResult != ""){
+                    $response['status'] = 'success';
+                    $response['vehicle-details'] = $vehicleResult;
+                }else{
+                    $response['status']='fail';
+                    $response['message']="No vehicle found for this user";    
+                }
             }
         }else {
             $response['status']='fail';
-            $response->message="No data found";
+            $response['message']="No data found";
         }
         return $response;
     }
@@ -110,45 +104,38 @@ class VehicleTable extends AbstractTableGateway {
         $queryStr = $sql->getSqlStringForSqlObject($query);
         $rResult=$dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
 
-        $checkQuery = $sql->select()->from('vehicle_details')
-                            ->where(array('vehicle_no'=>$params->vehicleNo))
-                            ->where('NOT vehicle_id ='.$params->vehicleId);
-        $checkQueryStr = $sql->getSqlStringForSqlObject($checkQuery);
-        $checkResult=$dbAdapter->query($checkQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-
-        if(!isset($checkResult->vehicle_id) && $checkResult->vehicle_id == ""){
+        if(isset($rResult->user_status) && $rResult->user_status == 'active'){
             
-            if(isset($rResult->user_status) && $rResult->user_status == 'active'){
-              
-                if(isset($params->vehicleId) && trim($params->vehicleId)!="")
-                {
-                    $data = array(
-                        'vehicle_no' => $params->vehicleNo,
-                        'user_id' => $params->userId,
-                        'vehicle_brand' => $params->vehicleBrand,
-                        'vehicle_model' => $params->vehicleModel,
-                        'vehicle_type' => $params->vehicleType,
-                    );
-                    $updateResult = $this->update($data,array('vehicle_id'=>$params->vehicleId));
+            if(isset($params->vehicleId) && trim($params->vehicleId)!="")
+            {
+                $data = array(
+                    'vehicle_no' => $params->vehicleNo,
+                    'user_id' => $params->userId,
+                    'vehicle_name' => $params->vehicleName,
+                    'vehicle_brand' => $params->vehicleBrand,
+                    'vehicle_model' => $params->vehicleModel,
+                    'vehicle_type' => $params->vehicleType,
+                    'vehicle_version' => $params->vehicleVersion,
+                    'year_of_purchase' => $params->yearPurchase,
+                    'km_done' => $params->kmDone,
+                    'avg_drive_per_week' => $params->avgDrive
+                );
+                $updateResult = $this->update($data,array('vehicle_id'=>$params->vehicleId));
 
-                    if($updateResult > 0){
-                        $response['status'] = 'success';
-                        $response['vehicle-details'] = 'Data updated successfully';
-                    }else{
-                        $response['status'] = 'failed';
-                        $response['Vehicle-details'] = 'No updates found';
-                    }
+                if($updateResult > 0){
+                    $response['status'] = 'success';
+                    $response['vehicle-details'] = 'Data updated successfully';
                 }else{
                     $response['status'] = 'failed';
-                    $response['Vehicle-details'] = 'Vehicle not found';
+                    $response['Vehicle-details'] = 'No updates found';
                 }
             }else{
                 $response['status'] = 'failed';
-                $response['Vehicle-details'] = 'You are not have privillage to update';
+                $response['Vehicle-details'] = 'Vehicle not found';
             }
         }else{
             $response['status'] = 'failed';
-            $response['Vehicle-details'] = 'vehicle number already exists.';
+            $response['Vehicle-details'] = 'You are not have privillage to update';
         }
         return $response;
     }
@@ -278,9 +265,14 @@ class VehicleTable extends AbstractTableGateway {
             $data = array(
                 'vehicle_no' => $params['vehicleNo'],
                 'user_id' => base64_decode($params['ownerName']),
+                'vehicle_name' => $params['vehicleName'],
                 'vehicle_brand' => $params['brand'],
                 'vehicle_model' => $params['model'],
-                'vehicle_type' => $params['type']
+                'vehicle_type' => $params['type'],
+                'vehicle_version' => $params['vehicleVersion'],
+                'year_of_purchase' => $params['yearPurchase'],
+                'km_done' => $params['kmDone'],
+                'avg_drive_per_week' => $params['avgDrive']
                 
             );
             $this->insert($data);
@@ -307,9 +299,14 @@ class VehicleTable extends AbstractTableGateway {
             $data = array(
                 'vehicle_no' => $params['vehicleNo'],
                 'user_id' => base64_decode($params['ownerName']),
+                'vehicle_name' => $params['vehicleName'],
                 'vehicle_brand' => $params['brand'],
                 'vehicle_model' => $params['model'],
-                'vehicle_type' => $params['type']
+                'vehicle_type' => $params['type'],
+                'vehicle_version' => $params['vehicleVersion'],
+                'year_of_purchase' => $params['yearPurchase'],
+                'km_done' => $params['kmDone'],
+                'avg_drive_per_week' => $params['avgDrive']
                 
             );
             $updateResult = $this->update($data,array('vehicle_id'=>base64_decode($params['vehicleId'])));

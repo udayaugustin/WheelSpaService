@@ -11,11 +11,13 @@ use Zend\View\Model\ViewModel;
 use User\Model\UserTable;
 use Vehicle\Model\VehicleTable;
 use Application\Model\RolesTable;
+use Application\Model\StateTable;
 
 // Service
 use Application\Service\CommonService;
 use User\Service\UserService;
 use Vehicle\Service\VehicleService;
+use Application\Service\AdminService;
 
 class Module{
      public function onBootstrap(MvcEvent $e){
@@ -84,6 +86,11 @@ class Module{
                         $table = new RolesTable($dbAdapter);
                         return $table;
                     },
+                    'StateTable' => function($sm) {
+                        $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                        $table = new StateTable($dbAdapter);
+                        return $table;
+                    },
 
                     //service
                     'CommonService' => function($sm) {
@@ -94,6 +101,9 @@ class Module{
                     },
                     'VehicleService' => function($sm) {
                         return new VehicleService($sm);
+                    },
+                    'AdminService' => function($sm) {
+                        return new AdminService($sm);
                     },
                )
           );

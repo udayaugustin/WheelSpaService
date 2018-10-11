@@ -23,12 +23,6 @@ class VehicleService {
         return $vehicleDb->addVehicleDetailsAPI($params);
     }
 
-    public function getAllVehicleListAPI($params)
-    {
-        $vehicleDb = $this->sm->get('VehicleTable');
-        return $vehicleDb->fetchAllVehicleListAPI($params);
-    }
-    
     public function getVehicleDetailsByIdAPI($params)
     {
         $vehicleDb = $this->sm->get('VehicleTable');

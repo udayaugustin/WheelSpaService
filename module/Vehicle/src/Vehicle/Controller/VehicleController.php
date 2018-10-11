@@ -16,13 +16,7 @@ class VehicleController extends AbstractRestfulController
             return new JsonModel($response);
         }
     }
-    public function allAction()
-    {
-        $params=$this->getRequest()->getQuery();
-        $vehicleService = $this->getServiceLocator()->get('VehicleService');
-        $response = $vehicleService->getAllVehicleListAPI($params);
-        return new JsonModel($response);
-    }
+    
     public function getAction() {
         $params=$this->getRequest()->getQuery();
         $vehicleService = $this->getServiceLocator()->get('VehicleService');

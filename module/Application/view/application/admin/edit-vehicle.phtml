@@ -44,21 +44,50 @@ $facilityId = array();
                     </div>
 
                     <div class="form-group row">
+                        <label class="col-sm-2 col-form-label" for="">Vehicle Name<span class="mandatory">*</span></label>
+                        <div class="col-sm-4">
+                            <input type="text" value="<?php echo $result['vehicle_name']; ?>" class="form-control isRequired" id="vehicleName" name="vehicleName" placeholder="Enter the vehicle name" title="Please enter the vehicle name">
+                        </div>
+
                         <label class="col-sm-2 col-form-label" for="">Vehicle Brand<span class="mandatory">*</span></label>
                         <div class="col-sm-4">
                             <input type="text" value="<?php echo $result['vehicle_brand']; ?>" class="form-control isRequired" id="brand" name="brand" placeholder="Enter the vehicle brand" title="Please enter the vehicle brand">
                         </div>
+                    </div>
 
+                    <div class="form-group row">
                         <label class="col-sm-2 col-form-label" for="">Vehicle Model<span class="mandatory">*</span></label>
                         <div class="col-sm-4">
                             <input type="text" value="<?php echo $result['vehicle_model']; ?>" class="form-control isRequired" id="model" name="model" placeholder="Enter the vehicle model" title="Please enter the vehicle model">
                         </div>
+
+                        <label class="col-sm-2 col-form-label" for="">Vehicle Type<span class="mandatory">*</span></label>
+                        <div class="col-sm-4">
+                            <input type="text" value="<?php echo $result['vehicle_no']; ?>" value="<?php echo $result['vehicle_type']; ?>"  class="form-control isRequired" id="type" name="type" placeholder="Enter the vehicle type" title="Please enter the type of vehicle">
+                        </div>
                     </div>
 
                     <div class="form-group row">
-                        <label class="col-sm-2 col-form-label" for="">Vehicle Type<span class="mandatory">*</span></label>
+                        <label class="col-sm-2 col-form-label" for="">Vehicle Version</label>
                         <div class="col-sm-4">
-                            <input type="text" value="<?php echo $result['vehicle_type']; ?>"  class="form-control isRequired" id="type" name="type" placeholder="Enter the vehicle type" title="Please enter the type of vehicle">
+                            <input type="text" value="<?php echo $result['vehicle_version']; ?>" class="form-control" id="vehicleVersion" name="vehicleVersion" placeholder="Enter the vehicle version" title="Please enter the vehicle version">
+                        </div>
+                        
+                        <label class="col-sm-2 col-form-label" for="">Year of Purchase</label>
+                        <div class="col-sm-4">
+                            <input type="text" value="<?php echo $result['year_of_purchase']; ?>" class="js-datepicker form-control" id="yearPurchase" name="yearPurchase" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy" placeholder="Enter the year of purchase" title="Please enter the year of purchase" readonly="readonly">
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label" for="">K.M Car Done So Far</label>
+                        <div class="col-sm-4">
+                            <input type="text" value="<?php echo $result['km_done']; ?>" class="form-control" id="kmDone" name="kmDone" placeholder="Enter the K.M car done so far" title="Please enter the K.M car done so far">
+                        </div>
+                        
+                        <label class="col-sm-2 col-form-label" for="">Average Drive Per Week</label>
+                        <div class="col-sm-4">
+                            <input type="text" value="<?php echo $result['avg_drive_per_week']; ?>" class="form-control" id="avgDrive" name="avgDrive" placeholder="Enter the average drive per week" title="Please enter the average drive per week">
                         </div>
                     </div>
                     
@@ -105,4 +134,10 @@ $facilityId = array();
             });
         }
     }
+
+    $("#yearPurchase").datepicker({
+        format: "yyyy",
+        viewMode: "years", 
+        minViewMode: "years"
+    });
 </script>
