@@ -8,7 +8,6 @@ use Zend\Db\TableGateway\AbstractTableGateway;
 use Zend\Db\Sql\Expression;
 use User\Service\CommonService;
 
-
 class UserTable extends AbstractTableGateway {
 
     protected $table = 'user_details';
@@ -25,17 +24,12 @@ class UserTable extends AbstractTableGateway {
         $sql = new Sql($dbAdapter);
         $password = sha1($params->password . $configResult["password"]["salt"]);
 
-        $query = $sql->select()->from(array('ud' => 'user_details'))->where(array('username' => $params->username,'password' => $password,'user_status' => 'active'))
+        $query = $sql->select()->from(array('ud' => 'user_details'))->where(array('username' => $params->username,'password' => $password))
                     ->join(array('r'=>'roles'),'ud.role_id=r.role_id',array('role_code'));
         $queryStr = $sql->getSqlStringForSqlObject($query);
         $rResult=$dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-
-        $statusQuery = $sql->select()->from(array('ud' => 'user_details'))
-                            ->where(array('user_id' => $rResult->user_id));
-        $statusQueryStr = $sql->getSqlStringForSqlObject($statusQuery);
-        $statusResult=$dbAdapter->query($statusQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         
-        if(isset($statusResult->user_status) && $statusResult->user_status == 'active'){
+        if(isset($rResult->user_status) && $rResult->user_status == 'active'){
             //Get Random string for authToken
             $authToken = $common->generateRandomString();;
         
@@ -213,14 +207,13 @@ class UserTable extends AbstractTableGateway {
         $logincontainer = new Container('credo');
         $config = new \Zend\Config\Reader\Ini();
         $configResult = $config->fromFile(CONFIG_PATH . '/custom.config.ini');
-        \Zend\Debug\Debug::dump($params);die;
         if(isset($params['userName']) && trim($params['userName'])!="" && trim($params['password'])!=""){
             $password = sha1($params['password'] . $configResult["password"]["salt"]);
             $dbAdapter = $this->adapter;
             $sql = new Sql($dbAdapter);
             $sQuery = $sql->select()->from(array('ud' => 'user_details'))
                     ->join(array('r' => 'roles'), 'ud.role_id = r.role_id', array('role_code'))
-				    ->where(array('ud.email' => $params['userName'], 'ud.password' => $password));
+				    ->where(array('ud.username' => $params['userName'], 'ud.password' => $password));
             $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
             $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
 
@@ -228,21 +221,200 @@ class UserTable extends AbstractTableGateway {
                         $logincontainer->userId = $rResult->user_id;
                         $logincontainer->roleId = $rResult->role_id;
                         $logincontainer->roleCode = $rResult->role_code;
-                        $logincontainer->userName = ucwords($rResult->user_name);
-                        $logincontainer->userEmail = ucwords($rResult->email);
+                        $logincontainer->userName = ucwords($rResult->name);
+                        $logincontainer->userEmail = ucwords($rResult->username);
                         if($rResult->role_code != 'admin'){
-                            return '/login';
+                            return 'login';
                         }else{
-                            return '/user';
+                            return 'home';
                         }
             }else {
                 $alertContainer->alertMsg = 'The email id or password that you entered is incorrect';
-                return '/login';
+                return 'login';
             }
         }else {
             $alertContainer->alertMsg = 'The email id or password that you entered is incorrect';
-            return '/login';
+            return 'login';
         }
     }
 
+    public function fetchUserDetails($parameters) {
+
+        $sessionLogin = new Container('credo');
+        $common = new CommonService();
+        $aColumns = array('ud.name','r.role_name','ud.username','ud.phone','ud.user_status');
+        $orderColumns = array('ud.name','r.role_name','ud.username','ud.phone','ud.user_status');
+
+        /* Paging */
+        $sLimit = "";
+        if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
+            $sOffset = $parameters['iDisplayStart'];
+            $sLimit = $parameters['iDisplayLength'];
+        }
+
+        /* Ordering */
+        $sOrder = "";
+        if (isset($parameters['iSortCol_0'])) {
+            for ($i = 0; $i < intval($parameters['iSortingCols']); $i++) {
+                if ($parameters['bSortable_' . intval($parameters['iSortCol_' . $i])] == "true") {
+                        $sOrder .= $aColumns[intval($parameters['iSortCol_' . $i])] . " " . ( $parameters['sSortDir_' . $i] ) . ",";
+                }
+            }
+            $sOrder = substr_replace($sOrder, "", -1);
+        }
+
+        /*
+        * Filtering
+        */
+
+        $sWhere = "";
+        if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
+            $searchArray = explode(" ", $parameters['sSearch']);
+            $sWhereSub = "";
+            foreach ($searchArray as $search) {
+                if ($sWhereSub == "") {
+                        $sWhereSub .= "(";
+                } else {
+                        $sWhereSub .= " AND (";
+                }
+                $colSize = count($aColumns);
+
+                for ($i = 0; $i < $colSize; $i++) {
+                    if ($i < $colSize - 1) {
+                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search ) . "%' OR ";
+                    } else {
+                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search ) . "%' ";
+                    }
+                }
+                $sWhereSub .= ")";
+            }
+            $sWhere .= $sWhereSub;
+        }
+
+        /* Individual column filtering */
+        for ($i = 0; $i < count($aColumns); $i++) {
+                if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
+                    if ($sWhere == "") {
+                        $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    } else {
+                        $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    }
+                }
+        }
+
+        /*
+        * Get data to display
+        */
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $roleId=$sessionLogin->roleId;
+
+        $sQuery = $sql->select()->from(array( 'ud' => 'user_details' ))
+                            ->join(array('r' => 'roles'), 'ud.role_id = r.role_id', array('role_name'));
+
+        if (isset($sWhere) && $sWhere != "") {
+                $sQuery->where($sWhere);
+        }
+
+        if (isset($sOrder) && $sOrder != "") {
+                $sQuery->order($sOrder);
+        }
+
+        if (isset($sLimit) && isset($sOffset)) {
+                $sQuery->limit($sLimit);
+                $sQuery->offset($sOffset);
+        }
+
+        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance
+        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+
+        /* Data set length after filtering */
+        $sQuery->reset('limit');
+        $sQuery->reset('offset');
+        $tQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance
+        $tResult = $dbAdapter->query($tQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+        $iFilteredTotal = count($tResult);
+        $output = array(
+                "sEcho" => intval($parameters['sEcho']),
+                "iTotalRecords" => count($tResult),
+                "iTotalDisplayRecords" => $iFilteredTotal,
+                "aaData" => array()
+        );
+
+        foreach ($rResult as $aRow) {
+
+            $row = array();
+            $row[] = ucwords($aRow['name']);
+            $row[] = ucwords($aRow['role_name']);
+            $row[] = $aRow['username'];
+            $row[] = $aRow['phone'];
+            $row[] = ucwords($aRow['user_status']);
+            $row[] = '<a href="/admin/edit-user/' . base64_encode($aRow['user_id']) . '" class="btn btn-default" style="margin-right: 2px;" title="Edit"><i class="far fa-edit"></i>Edit</a>';
+            $output['aaData'][] = $row;
+        }
+
+        return $output;
+    }
+
+    public function addUserDetails($params)
+    {
+        if(isset($params['name']) && trim($params['name'])!="")
+        {
+            $config = new \Zend\Config\Reader\Ini();
+            $configResult = $config->fromFile(CONFIG_PATH . '/custom.config.ini');
+            $password = sha1($params['password'] . $configResult["password"]["salt"]);
+            $data = array(
+                'name' => $params['name'],
+                'role_id' => base64_decode($params['roleName']),
+                'username' => $params['email'],
+                'password' => $password,
+                'phone' => $params['mobile'],
+                'user_status' => $params['userStatus']
+                
+            );
+            $this->insert($data);
+            $lastInsertedId = $this->lastInsertValue;
+        }
+        return $lastInsertedId;
+    }
+
+    public function fetchUserDetailsById($userId)
+    {
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $query = $sql->select()->from(array('ud' => 'user_details'))
+                        ->where(array('ud.user_id' => $userId));
+        $queryStr = $sql->getSqlStringForSqlObject($query);
+        $rResult=$dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+        return $rResult;
+    }
+
+    public function updateUserDetailsById($params)
+    {
+        $config = new \Zend\Config\Reader\Ini();
+        $configResult = $config->fromFile(CONFIG_PATH . '/custom.config.ini');
+
+        if(isset($params['userId']) && trim($params['userId'])!="")
+        {
+            $data = array(
+                'name' => $params['name'],
+                'role_id' => base64_decode($params['roleName']),
+                'username' => $params['email'],
+                'phone' => $params['mobile'],
+                'user_status' => $params['userStatus']
+            );
+            if($params['password']!=''){
+                $password = sha1($params['password'] . $configResult["password"]["salt"]);
+                $data['password'] = $password;
+            }
+            // \Zend\Debug\Debug::dump($data);die;
+            $updateResult = $this->update($data,array('user_id'=>base64_decode($params['userId'])));
+            $lastInsertedId = base64_decode($params['userId']);
+        }
+        return $lastInsertedId;
+    }
+
+    public function fetchAllUsers(){
+        return $this->select()->toArray();
+    }
 }

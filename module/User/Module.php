@@ -13,17 +13,21 @@ class Module
     public function getServiceConfig() {
         return array(
              'factories' => array(
-                  //Table
-                  'UserTable' => function($sm) {
-                      $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
-                      $table = new UserTable($dbAdapter);
-                      return $table;
-                  },
+                //Table
+                'UserTable' => function($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $table = new UserTable($dbAdapter);
+                    return $table;
+                },
 
-                  //service
-                  'UserService' => function($sm) {
-                      return new UserService($sm);
-                  },
+                //service
+                'UserService' => function($sm) {
+                    return new UserService($sm);
+                },
+
+                'CommonService' => function($sm) {
+                    return new CommonService($sm);
+                },
              )
         );
     }

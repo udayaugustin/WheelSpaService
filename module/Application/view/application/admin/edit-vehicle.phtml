@@ -1,0 +1,108 @@
+<?php
+use Zend\Session\Container;
+$sessionLogin = new Container('credo');
+$facilityId = array();
+?>
+<div class="bg-body-light">
+     <div class="content content-full">
+          <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center">
+               <h1 class="flex-sm-fill font-size-h2 font-w400 mt-2 mb-0 mb-sm-2">Vehicles</h1>
+               <nav class="flex-sm-00-auto ml-sm-3" aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                         <a href="<?php echo $this->url('admin', array('action' => 'vehicle')); ?>"><li class="breadcrumb-item">Vehicles Details</li></a>
+                         <li class="breadcrumb-item active" aria-current="page">&nbsp;/ Edit</li>
+                    </ol>
+               </nav>
+          </div>
+     </div>
+</div>
+
+
+<div class="content">
+    <div class="block block-rounded block-bordered">
+        <div class="block-header block-header-default">
+            <h3 class="block-title">Edit Vehicles Details</h3>
+        </div>
+        <div class="block-content">
+            <div class="col-md-12 table-responsive" id="hide">
+                <form name="vehicleInformation" id="vehicleInformation"  class="mb-5" action="<?php echo $this->url('admin', array('action' => 'edit-vehicle')); ?>" method="post">
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label" for="">Vehicle Number<span class="mandatory">*</span></label>
+                        <div class="col-sm-4">
+                            <input type="text" value="<?php echo $result['vehicle_no']; ?>"  class="form-control isRequired" id="vehicleNo" name="vehicleNo" placeholder="Enter the vehicle number" title="Please enter the vehicle number" onblur="checkNameValidation('vehicle_details', 'vehicle_no', this,null, 'The vehicle number that you entered already exists . Please try another number..');">
+                        </div>
+
+                        <label class="col-sm-2 col-form-label" for="">Select Owner<span class="mandatory">*</span></label>
+                        <div class="col-sm-4">
+                            <select class="form-control isRequired" id="ownerName" name="ownerName" title="Please select the owner name">
+                                <option value="">--Select--</option>
+                                <?php foreach($userResult as $user){?>
+                                    <option value="<?php echo base64_encode($user['user_id']); ?>" <?php echo($result['user_id'] == $user['user_id'] )?'selected="selected"':''; ?>><?php echo $user['name']; ?></option>
+                                <?php } ?>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label" for="">Vehicle Brand<span class="mandatory">*</span></label>
+                        <div class="col-sm-4">
+                            <input type="text" value="<?php echo $result['vehicle_brand']; ?>" class="form-control isRequired" id="brand" name="brand" placeholder="Enter the vehicle brand" title="Please enter the vehicle brand">
+                        </div>
+
+                        <label class="col-sm-2 col-form-label" for="">Vehicle Model<span class="mandatory">*</span></label>
+                        <div class="col-sm-4">
+                            <input type="text" value="<?php echo $result['vehicle_model']; ?>" class="form-control isRequired" id="model" name="model" placeholder="Enter the vehicle model" title="Please enter the vehicle model">
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label" for="">Vehicle Type<span class="mandatory">*</span></label>
+                        <div class="col-sm-4">
+                            <input type="text" value="<?php echo $result['vehicle_type']; ?>"  class="form-control isRequired" id="type" name="type" placeholder="Enter the vehicle type" title="Please enter the type of vehicle">
+                        </div>
+                    </div>
+                    
+                    <div class="row items-push">
+                        <div class="col-lg-7 offset-lg-4">
+                            <input type="hidden" name="vehicleId" value="<?php echo base64_encode($result['vehicle_id']);?>">
+                            <a href="<?php echo $this->url('admin', array('action' => 'vehicle')); ?>" class="btn btn-danger">Cancel</a>&nbsp;
+                            <button type="submit" class="btn btn-primary" onclick="validateNow();return false;"><i class="fa fa-fw fa-check"></i> Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    duplicateName = true;
+    function validateNow() {
+        flag = deforayValidator.init({
+            formId: 'vehicleInformation'
+        });
+        if (flag) {
+            if (duplicateName) {
+                $.blockUI();
+                
+                document.getElementById('vehicleInformation').submit();
+            }
+        }
+    }
+    function checkNameValidation(tableName, fieldName, obj, fnct, msg){
+        checkValue = document.getElementById(obj.id).value;
+        if($.trim(checkValue)!= ''){
+            $.post("<?php echo $this->url('common', array('action' => 'index')); ?>", { tableName: tableName, fieldName: fieldName, value: checkValue, fnct: fnct},
+            function(data) {
+                if (data > 0)
+                {
+                        alert(msg);
+                        duplicateName = false;
+                        document.getElementById(obj.id).value = "";
+                }
+                else {
+                        duplicateName = true;
+                }
+            });
+        }
+    }
+</script>

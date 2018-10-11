@@ -6,19 +6,6 @@ return array(
             'User\Controller\User' => 'User\Controller\UserController',
         ),
     ),
-    'session' => array(
-        'config' => array(
-            'class' => 'Zend\Session\Config\SessionConfig',
-            'options' => array(
-                'name' => 'myapp',
-            ),
-        ),
-        'storage' => 'Zend\Session\Storage\SessionArrayStorage',
-        'validators' => array(
-            'Zend\Session\Validator\RemoteAddr',
-            'Zend\Session\Validator\HttpUserAgent',
-        ),
-    ),
 
     // Controller config
     'router' => array(
@@ -39,48 +26,9 @@ return array(
         ),
     ),
 
-    'service_manager' => array(
-        'abstract_factories' => array(
-             'Zend\Cache\Service\StorageCacheAbstractServiceFactory',
-             'Zend\Log\LoggerAbstractServiceFactory',
-        ),
-        'aliases' => array(
-             'translator' => 'MvcTranslator',
-        ),
-    ),
-    'translator' => array(
-            'locale' => 'en_US',
-            'translation_file_patterns' => array(
-                array(
-                    'type'     => 'gettext',
-                    'base_dir' => __DIR__ . '/../language',
-                    'pattern'  => '%s.mo',
-                ),
-            ),
-    ),
-
     'view_manager' => array(
-        'display_not_found_reason' => true,
-        'display_exceptions'       => true,
-        'doctype'                  => 'HTML5',
-        'not_found_template'       => 'error/404',
-        'exception_template'       => 'error/index',
-        'template_map' => array(
-            'layout/layout'             => __DIR__ . '/../view/layout/layout.phtml',
-            'user/index/index'          => __DIR__ . '/../view/user/index/index.phtml',
-            'error/404'                 => __DIR__ . '/../view/error/404.phtml',
-            'error/index'               => __DIR__ . '/../view/error/index.phtml',
-        ),
-        'template_path_stack' => array(
-            __DIR__ . '/../view',
-        ),
         'strategies' => array(
             'ViewJsonStrategy',
         ),
     ),
-    'view_helpers' => array(
-        'invokables'=> array(
-             'category_helper' => 'Application\View\Helper\CategoryHelper',
-        )
-   ),
 );
