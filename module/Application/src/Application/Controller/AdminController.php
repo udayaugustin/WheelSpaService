@@ -185,4 +185,78 @@ class AdminController extends AbstractActionController
         }
     }
 
+    public function tyreAction()
+    {
+        $session = new Container('credo');
+        if($session->roleCode == 'admin'){
+            $request = $this->getRequest();
+            if ($request->isPost()) {
+                $params = $request->getPost();
+                $userService = $this->getServiceLocator()->get('TyreService');
+                $result = $userService->getTyreDetails($params);
+                return $this->getResponse()->setContent(Json::encode($result));
+            }
+        }else{
+            return $this->redirect()->toUrl("login");
+        }
+    }
+
+    public function addTyreAction()
+    {
+        $session = new Container('credo');
+        if($session->roleCode == 'admin'){
+            $request = $this->getRequest();
+            $userService = $this->getServiceLocator()->get('UserService');
+            $vehicleService = $this->getServiceLocator()->get('VehicleService');
+            $tyreService = $this->getServiceLocator()->get('TyreService');
+            if ($request->isPost()) {
+                $params = $request->getPost();
+                $result = $tyreService->addTyre($params);
+                return $this->redirect()->toUrl("/admin/tyre");
+            }else{
+                $userResult=$userService->getAllUsers();
+                $vehicleResult=$vehicleService->getAllVehicle();
+                return new ViewModel(array(
+                    'userResult' => $userResult,
+                    'vehicleResult' => $vehicleResult,
+                ));
+            }
+        }else{
+            return $this->redirect()->toUrl("login");
+        }
+    }
+
+    public function editTyreAction()
+    {
+        $session = new Container('credo');
+        if($session->roleCode == 'admin'){
+            $userService = $this->getServiceLocator()->get('UserService');
+            $vehicleService = $this->getServiceLocator()->get('VehicleService');
+            $tyreService = $this->getServiceLocator()->get('TyreService');
+            if($this->getRequest()->isPost())
+            {
+                $params=$this->getRequest()->getPost();
+                $result=$tyreService->updateTyreDetails($params);
+                return $this->redirect()->toUrl('/admin/tyre');
+            }
+            else
+            {
+                $vehicleId=base64_decode( $this->params()->fromRoute('id') );
+                if($vehicleId!=''){
+                    $userResult=$userService->getAllUsers();
+                    $vehicleResult=$vehicleService->getAllVehicle();
+                    $result=$tyreService->getTyreDetailsById($vehicleId);
+                    return new ViewModel(array(
+                        'userResult' => $userResult,
+                        'vehicleResult' => $vehicleResult,
+                        'result' => $result,
+                    ));
+                }else{
+                    return $this->redirect()->toUrl("/admin/tyre");
+                }
+            }
+        }else{
+            return $this->redirect()->toUrl("login");
+        }
+    }
 }

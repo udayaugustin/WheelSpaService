@@ -386,6 +386,7 @@ class UserTable extends AbstractTableGateway {
         $common = new CommonService;
         if(isset($params['userId']) && trim($params['userId'])!="")
         {
+            $lastInsertedId = 0;
             $data = array(
                 'name' => $params['name'],
                 'role_id' => base64_decode($params['roleName']),
@@ -404,7 +405,9 @@ class UserTable extends AbstractTableGateway {
             }
             // \Zend\Debug\Debug::dump($data);die;
             $updateResult = $this->update($data,array('user_id'=>base64_decode($params['userId'])));
-            $lastInsertedId = base64_decode($params['userId']);
+            if($updateResult > 0){
+                $lastInsertedId = 1;
+            }
         }
         return $lastInsertedId;
     }

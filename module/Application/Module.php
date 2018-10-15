@@ -17,6 +17,7 @@ use Application\Model\StateTable;
 use Application\Service\CommonService;
 use User\Service\UserService;
 use Vehicle\Service\VehicleService;
+use Tyre\Service\TyreService;
 use Application\Service\AdminService;
 
 class Module{
@@ -101,6 +102,9 @@ class Module{
                     },
                     'VehicleService' => function($sm) {
                         return new VehicleService($sm);
+                    },
+                    'TyreService' => function($sm) {
+                        return new TyreService($sm);
                     },
                     'AdminService' => function($sm) {
                         return new AdminService($sm);

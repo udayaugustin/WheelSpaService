@@ -86,4 +86,10 @@ class VehicleService {
             error_log($exc->getTraceAsString());
         }
     }
+
+    public function getAllVehicle()
+    {
+        $vehicleDb = $this->sm->get('VehicleTable');
+        return $vehicleDb->fetchAllVehicle();
+    }
 }

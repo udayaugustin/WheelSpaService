@@ -8,8 +8,9 @@ $userName = $sessionLogin->userName;
 // \Zend\Debug\Debug::dump($roleCode);die;
 
 $tyreMenu = "";
-$tyreMenu.="<li id='nav-main-item'><a id='user' class='nav-main-link' href=". $this->url('admin', array('action' => 'user')) ."><span class='nav-main-link-name'>User</span></a></li>";
-$tyreMenu.="<li id='nav-main-item'><a id='vehicle' class='nav-main-link' href=". $this->url('admin', array('action' => 'vehicle')) ."><span class='nav-main-link-name'>vehicle</span></a></li>";
+$tyreMenu.="<li id='nav-main-item'><a id='user' class='nav-main-link' href=". $this->url('admin', array('action' => 'user')) ."><span class='nav-main-link-name'>User Details</span></a></li>";
+$tyreMenu.="<li id='nav-main-item'><a id='vehicle' class='nav-main-link' href=". $this->url('admin', array('action' => 'vehicle')) ."><span class='nav-main-link-name'>Vehicle Details</span></a></li>";
+$tyreMenu.="<li id='nav-main-item'><a id='tyre' class='nav-main-link' href=". $this->url('admin', array('action' => 'tyre')) ."><span class='nav-main-link-name'>Tyre Details</span></a></li>";
 ?>
 
 <!doctype html>
@@ -247,6 +248,9 @@ $tyreMenu.="<li id='nav-main-item'><a id='vehicle' class='nav-main-link' href=".
         else if( splitsUrl[2] == 'vehicle' || splitsUrl[2] == 'add-vehicle' || splitsUrl[2] == 'edit-vehicle' ){
           $('#manage').addClass('open');
           $('#vehicle').addClass('active');
+        }else if( splitsUrl[2] == 'tyre' || splitsUrl[2] == 'add-tyre' || splitsUrl[2] == 'edit-tyre' ){
+          $('#manage').addClass('open');
+          $('#tyre').addClass('active');
         }
         else{
           $('#'+splitsUrl[2]).addClass('active');
