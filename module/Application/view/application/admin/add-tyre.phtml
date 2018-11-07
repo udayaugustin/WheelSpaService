@@ -1,0 +1,305 @@
+<?php
+use Zend\Session\Container;
+$sessionLogin = new Container('credo');
+?>
+<div class="bg-body-light">
+     <div class="content content-full">
+          <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center">
+               <h1 class="flex-sm-fill font-size-h2 font-w400 mt-2 mb-0 mb-sm-2">Tyres</h1>
+               <nav class="flex-sm-00-auto ml-sm-3" aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                         <a href="<?php echo $this->url('admin', array('action' => 'tyre')); ?>"><li class="breadcrumb-item">Tyres Details</li></a>
+                         <li class="breadcrumb-item active" aria-current="page">&nbsp;/ Add</li>
+                    </ol>
+               </nav>
+          </div>
+     </div>
+</div>
+
+
+<div class="content">
+    <div class="block block-rounded block-bordered">
+        <div class="block-header block-header-default">
+            <h3 class="block-title">Add Tyres Details</h3>
+        </div>
+        <div class="block-content">
+            <div class="col-md-12" id="hide">
+                <form name="tyreInformation" id="tyreInformation"  class="mb-5" action="<?php echo $this->url('admin', array('action' => 'add-tyre')); ?>" method="post">
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label" for="">Tyre Type<span class="mandatory">*</span></label>
+                        <div class="col-sm-4">
+                            <select class="form-control isRequired" id="tyreType" name="tyreType" title="Please select the tyre type">
+                                <option value="same">Same</option>
+                                <option value="different">Different</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="js-wizard-simple block block block-rounded block-bordered">
+                         <ul class="nav nav-tabs nav-tabs-block nav-justified" role="tablist">
+                              <li class="nav-item">
+                                   <a class="nav-link active" href="javascript:void()" id="step1" onclick="validateStep2()">1. Same Type</a>
+                              </li>
+                              <li class="nav-item">
+                                   <a class="nav-link" href="javascript:void()" id="step2" onclick="validateStep1();">2. Different Type</a>
+                              </li>
+                         </ul>
+                         <div class="block-content block-content-full tab-content" style="min-height: 300px;">
+                            <div class="tab-pane active" id="wizard-progress-step1" role="tabpanel">
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label" for="">Select Vehicle<span class="mandatory">*</span></label>
+                                    <div class="col-sm-4">
+                                        <select class="form-control isRequired" id="vehicleId" name="vehicleId[]" title="Please select the vehicle">
+                                            <option value="">--Select--</option>
+                                            <?php foreach($vehicleResult as $vehicle){?>
+                                                <option value="<?php echo base64_encode($vehicle['vehicle_id']); ?>"><?php echo $vehicle['vehicle_no']; ?></option>
+                                            <?php } ?>
+                                        </select>
+                                    </div>
+            
+                                    <label class="col-sm-2 col-form-label" for="">Select Owner<span class="mandatory">*</span></label>
+                                    <div class="col-sm-4">
+                                        <select class="form-control isRequired" id="ownerName" name="ownerName[]" title="Please select the owner name">
+                                            <option value="">--Select--</option>
+                                            <?php foreach($userResult as $user){?>
+                                                <option value="<?php echo base64_encode($user['user_id']); ?>"><?php echo $user['name']; ?></option>
+                                            <?php } ?>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label" for="">Tyre<span class="mandatory">*</span></label>
+                                    <div class="col-sm-4">
+                                        <select class="form-control isRequired" id="tyre" name="tyre[]" title="Please select the tyre">
+                                            <option value="new">New</option>
+                                            <option value="old">Old</option>
+                                        </select>
+                                    </div>
+            
+                                    <label class="col-sm-2 col-form-label" for="">Tyre Brand<span class="mandatory">*</span></label>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control isRequired" id="tyreBrand" name="tyreBrand[]" placeholder="Enter the brand" title="Please enter the brand">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label" for="">Tyre Name<span class="mandatory">*</span></label>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control isRequired" id="tyreName" name="tyreName[]" placeholder="Enter the name" title="Please enter the name">
+                                    </div>
+            
+                                    <label class="col-sm-2 col-form-label" for="">Date Of Parchase</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="js-datepicker form-control" id="dateParchase" name="dateParchase[]" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="dd-M-yyyy" placeholder="Enter the date of parchase" title="Please enter the date of parchase" readonly="readonly">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label" for="">Tyre Size</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" id="tyreSize" name="tyreSize[]" placeholder="Enter the size" title="Please enter the size">   
+                                    </div>
+            
+                                    <label class="col-sm-2 col-form-label" for="">Tyre Life Remaining</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" id="tyreLife" name="tyreLife[]" placeholder="Enter the tyre life" title="Please enter the tyre life">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label" for="">Tyre Side<span class="mandatory">*</span></label>
+                                    <div class="col-sm-4">
+                                        <select class="form-control isRequired" id="tyreSide" name="tyreSide[]" title="Please select the tyre side">
+                                            <option value="front">Front</option>
+                                            <option value="back">Back</option>
+                                        </select>
+                                    </div>
+            
+                                    <label class="col-sm-2 col-form-label" for="">Rim Size</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" id="rimSize" name="rimSize[]" placeholder="Enter the rim size" title="Please enter the rim size">   
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane" id="wizard-progress-step2" role="tabpanel">
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label" for="">Select Vehicle<span class="mandatory">*</span></label>
+                                    <div class="col-sm-4">
+                                        <select class="form-control" id="vehicleId" name="vehicleId[]" title="Please select the vehicle">
+                                            <option value="">--Select--</option>
+                                            <?php foreach($vehicleResult as $vehicle){?>
+                                                <option value="<?php echo base64_encode($vehicle['vehicle_id']); ?>"><?php echo $vehicle['vehicle_no']; ?></option>
+                                            <?php } ?>
+                                        </select>
+                                    </div>
+
+                                    <label class="col-sm-2 col-form-label" for="">Select Owner<span class="mandatory">*</span></label>
+                                    <div class="col-sm-4">
+                                        <select class="form-control" id="ownerName" name="ownerName[]" title="Please select the owner name">
+                                            <option value="">--Select--</option>
+                                            <?php foreach($userResult as $user){?>
+                                                <option value="<?php echo base64_encode($user['user_id']); ?>"><?php echo $user['name']; ?></option>
+                                            <?php } ?>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label" for="">Tyre<span class="mandatory">*</span></label>
+                                    <div class="col-sm-4">
+                                        <select class="form-control" id="tyre1" name="tyre[]" title="Please select the tyre">
+                                            <option value="new">New</option>
+                                            <option value="old">Old</option>
+                                        </select>
+                                    </div>
+
+                                    <label class="col-sm-2 col-form-label" for="">Tyre Brand<span class="mandatory">*</span></label>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" id="tyreBrand1" name="tyreBrand[]" placeholder="Enter the brand" title="Please enter the brand">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label" for="">Tyre Name<span class="mandatory">*</span></label>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" id="tyreName1" name="tyreName[]" placeholder="Enter the name" title="Please enter the name">
+                                    </div>
+
+                                    <label class="col-sm-2 col-form-label" for="">Date Of Parchase</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="js-datepicker form-control" id="dateParchase1" name="dateParchase[]" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="dd-M-yyyy" placeholder="Enter the date of parchase" title="Please enter the date of parchase" readonly="readonly">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label" for="">Tyre Size</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" id="tyreSize1" name="tyreSize[]" placeholder="Enter the size" title="Please enter the size">   
+                                    </div>
+
+                                    <label class="col-sm-2 col-form-label" for="">Tyre Life Remaining</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" id="tyreLife1" name="tyreLife[]" placeholder="Enter the tyre life" title="Please enter the tyre life">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label" for="">Tyre Side<span class="mandatory">*</span></label>
+                                    <div class="col-sm-4">
+                                        <select class="form-control" id="tyreSide1" name="tyreSide[]" title="Please select the tyre side">
+                                            <option value="front">Front</option>
+                                            <option value="back">Back</option>
+                                        </select>
+                                    </div>
+
+                                    <label class="col-sm-2 col-form-label" for="">Rim Size</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" id="rimSize1" name="rimSize[]" placeholder="Enter the rim size" title="Please enter the rim size">   
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row items-push">
+                        <div class="col-lg-7 offset-lg-4">
+                            <a href="<?php echo $this->url('admin', array('action' => 'tyre')); ?>" class="btn btn-danger">Cancel</a>&nbsp;
+                            <button type="submit" class="btn btn-primary" onclick="validateNow();return false;"><i class="fa fa-fw fa-check"></i> Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    duplicateName = true;
+    function validateNow() {
+        flag = deforayValidator.init({
+            formId: 'tyreInformation'
+        });
+        if (flag) {
+            if (duplicateName) {
+                $.blockUI();
+                document.getElementById('tyreInformation').submit();
+            }
+        }
+    }
+    function checkNameValidation(tableName, fieldName, obj, fnct, msg){
+        checkValue = document.getElementById(obj.id).value;
+        if($.trim(checkValue)!= ''){
+            $.post("<?php echo $this->url('common', array('action' => 'index')); ?>", { tableName: tableName, fieldName: fieldName, value: checkValue, fnct: fnct},
+            function(data) {
+                if (data > 0)
+                {
+                        alert(msg);
+                        duplicateName = false;
+                        document.getElementById(obj.id).value = "";
+                }
+                else {
+                        duplicateName = true;
+                }
+            });
+        }
+    }
+
+    function validateStep1()
+{
+    if( ( $("#sampleId").val() != "" ) || ( $("#patientId").val() != "" ) ){
+        flag = deforayValidator.init({
+                    formId: 'recencyInformation'
+        });
+        if (flag) {
+            $("#residence").addClass("<?php echo $residence;?>");
+            $("#maritalStatus").addClass("<?php echo $marital;?>");
+            $("#educationLevel").addClass("<?php echo $education;?>");
+            $("#riskPopulation").addClass("<?php echo $risk;?>");
+            $("#otherRiskPopulation").addClass("<?php echo $otherRiskPopInpt;?>");
+            $("#pregnancyStatus").addClass("<?php echo $pregnancy;?>");
+            $("#currentSexualPartner").addClass("<?php echo $partner;?>");
+            $("#pastHivTesting").addClass("<?php echo $testing;?>");
+            $("#dob").addClass("<?php echo $dob;?>");
+            $("#age").addClass("<?php echo $age;?>");
+            $("#testLast12Month").addClass("<?php echo $last;?>");
+
+            // $("#lastHivStatus").removeClass("<?php echo $hivStatus;?>");
+            // $("#patientOnArt").removeClass("<?php echo $patientArt;?>");
+
+            $("#step1,#wizard-progress-step1").removeClass("active");
+            $("#step2,#wizard-progress-step2").addClass("active");
+
+            $(".btnHide").show();
+            $(".nxtBtn").hide();
+        }
+    }else{
+            $(".btnHide").hide();
+            $("#sampleId").focus();
+            $("#sampleId").css("border","1px solid rgb(207, 51, 57)");
+            alert("Please enter either sample or patient id  ",'err');
+    }
+}
+function validateStep2()
+{
+    $("#residence").removeClass('isRequired');
+    $("#step1,#wizard-progress-step1").addClass("active");
+    $("#step2,#wizard-progress-step2").removeClass("active");
+     $("#dob").removeClass('isRequired');
+     $("#age").removeClass('isRequired');
+
+    $(".btnHide").hide();
+    $(".nxtBtn").show();
+}
+    function validateNow() {
+        flag = deforayValidator.init({
+            formId: 'recencyInformation'
+        });
+        document.getElementById("outcomeData").value=document.getElementById("outcome").innerHTML;
+        if (flag) {
+            $.blockUI();
+            document.getElementById('recencyInformation').submit();
+        }
+    }
+
+</script>

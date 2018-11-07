@@ -1,0 +1,155 @@
+<?php
+use Zend\Session\Container;
+$sessionLogin = new Container('credo');
+$facilityId = array();
+// \Zend\Debug\Debug::dump($result);die;
+use User\Service\CommonService;
+$common = new CommonService;
+?>
+<div class="bg-body-light">
+     <div class="content content-full">
+          <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center">
+               <h1 class="flex-sm-fill font-size-h2 font-w400 mt-2 mb-0 mb-sm-2">Edit Profile</h1>
+               <nav class="flex-sm-00-auto ml-sm-3" aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                         <a href="<?php echo $this->url('admin', array('action' => 'index')); ?>"><li class="breadcrumb-item">Home</li></a>
+                         <li class="breadcrumb-item active" aria-current="page">&nbsp;/ Edit Profile</li>
+                    </ol>
+               </nav>
+          </div>
+     </div>
+</div>
+
+
+<div class="content">
+    <div class="block block-rounded block-bordered">
+        <div class="block-header block-header-default">
+            <h3 class="block-title">Edit Profile Details</h3>
+        </div>
+        <div class="block-content">
+            <div class="col-md-12 table-responsive" id="hide">
+            <form name="userInformation" id="userInformation"  class="mb-5" action="<?php echo $this->url('admin', array('action' => 'edit-user')); ?>" method="post">
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label" for="">Name<span class="mandatory">*</span></label>
+                        <div class="col-sm-4">
+                            <input type="text" value="<?php echo $result['name']; ?>"  class="form-control isRequired" id="name" name="name" placeholder="Enter the name" title="Please enter the name">
+                        </div>
+
+                        <label class="col-sm-2 col-form-label" for="">Role<span class="mandatory">*</span></label>
+                        <div class="col-sm-4">
+                            <select class="form-control isRequired" id="roleName" name="roleName" title="Please select the role name">
+                                <option value="">--Select--</option>
+                                <?php foreach($roleResult as $role){?>
+                                    <option value="<?php echo base64_encode($role['role_id']); ?>" <?php echo($result['role_id'] == $role['role_id'] )?'selected="selected"':''; ?>><?php echo $role['role_name']; ?></option>
+                                <?php } ?>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label" for="">Email<span class="mandatory">*</span></label>
+                        <div class="col-sm-4">
+                            <input type="email" value="<?php echo $result['username']; ?>"  class="form-control isRequired" id="email" name="email" placeholder="Enter the email" title="Please enter the email" onblur="checkNameValidation('user_details', 'username', this,null, 'The email that you entered already exists . Please try another name..');">
+                        </div>
+
+                        <label class="col-sm-2 col-form-label" for="">Password</label>
+                        <div class="col-sm-4">
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Enter the Password" title="Please enter the password">
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label" for="">Mobile<span class="mandatory">*</span></label>
+                        <div class="col-sm-4">
+                            <input type="number" value="<?php echo $result['phone']; ?>" class="form-control isRequired" id="mobile" name="mobile" placeholder="Enter the mobile" title="Please enter the mobile">
+                        </div>
+
+                        <label class="col-sm-2 col-form-label" for="">DOB</label>
+                        <div class="col-sm-4">
+                                <input type="text" value="<?php echo $common->humanDateFormat($result['user_dob']); ?>" class="js-datepicker form-control" id="dob" name="dob" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="dd-M-yyyy" value="" placeholder="Enter the dob" title="Please enter the dob" readonly="readonly">
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label" for="">State</label>
+                        <div class="col-sm-4">
+                            <select class="form-control" id="state" name="state" title="Please select the state">
+                                <option value="">--Select--</option>
+                                <?php foreach($stateResult as $state){?>
+                                    <option value="<?php echo $state['state_id']; ?>" <?php echo($result['state'] == $state['state_id'] )?'selected="selected"':''; ?>><?php echo $state['state_name']; ?></option>
+                                <?php } ?>
+                            </select>
+                        </div>
+                       
+                        <label class="col-sm-2 col-form-label" for="">City</label>
+                        <div class="col-sm-4">
+                            <input type="text" value="<?php echo $result['city']; ?>" class="form-control" id="city" name="city" placeholder="Enter the city" title="Please enter the city">
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label" for="">Pincode</label>
+                        <div class="col-sm-4">
+                            <input type="number" value="<?php echo $result['pincode']; ?>" class="form-control" id="pincode" name="pincode" placeholder="Enter the pincode" title="Please enter the pincode">
+                        </div>
+
+                        <label class="col-sm-2 col-form-label" for="">Status<span class="mandatory">*</span></label>
+                        <div class="col-sm-4">
+                            <select class="form-control isRequired" id="userStatus" name="userStatus" title="Please select the user status">
+                                <option value="active" <?php echo($result['user_status'] == 'active' )?'selected="selected"':''; ?>>Active</option>
+                                <option value="inactive" <?php echo($result['user_status'] == 'inactive' )?'selected="selected"':''; ?>>Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label" for="">Address</label>
+                        <div class="col-sm-4">
+                            <textarea class="form-control" id="address" rows="4" cols="50" name="address" placeholder="Enter the address" title="Please enter the address"><?php echo $result['street_address']; ?></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="row items-push">
+                        <div class="col-lg-7 offset-lg-4">
+                            <input type="hidden" name="userId" value="<?php echo base64_encode($result['user_id']);?>" >
+                            <a href="<?php echo $this->url('admin', array('action' => 'user')); ?>" class="btn btn-danger">Cancel</a>&nbsp;
+                            <button type="submit" class="btn btn-primary" onclick="validateNow();return false;"><i class="fa fa-fw fa-check"></i> Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    duplicateName = true;
+    function validateNow() {
+        flag = deforayValidator.init({
+            formId: 'userInformation'
+        });
+        if (flag) {
+            if (duplicateName) {
+                $.blockUI();
+                
+                document.getElementById('userInformation').submit();
+            }
+        }
+    }
+    function checkNameValidation(tableName, fieldName, obj, fnct, msg){
+        checkValue = document.getElementById(obj.id).value;
+        if($.trim(checkValue)!= ''){
+            $.post("<?php echo $this->url('common', array('action' => 'index')); ?>", { tableName: tableName, fieldName: fieldName, value: checkValue, fnct: fnct},
+            function(data) {
+                if (data > 0)
+                {
+                        alert(msg);
+                        duplicateName = false;
+                        document.getElementById(obj.id).value = "";
+                }
+                else {
+                        duplicateName = true;
+                }
+            });
+        }
+    }
+</script>

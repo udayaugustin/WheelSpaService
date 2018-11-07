@@ -4,25 +4,20 @@ namespace User\Controller;
 
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
+use Zend\Json\Json;
 
 class UserController extends AbstractRestfulController
 {
     public function addAction() {
         $request = $this->getRequest();
         if ($request->isPost()) {
-            $params = $request->getPost();
+            $params = \Zend\Json\Json::decode($request->getContent());
             $userService = $this->getServiceLocator()->get('UserService');
             $response =$userService->addNewUserDetailsAPI($params);
             return new JsonModel($response);
         }
     }
-    public function getallAction()
-    {
-        $params=$this->getRequest()->getQuery();
-        $userService = $this->getServiceLocator()->get('UserService');
-        $response = $userService->getAllUserListAPI($params);
-        return new JsonModel($response);
-    }
+    
     public function getAction() {
         $params=$this->getRequest()->getQuery();
         $userService = $this->getServiceLocator()->get('UserService');
