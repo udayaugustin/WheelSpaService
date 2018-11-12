@@ -272,23 +272,27 @@ class TyreTable extends AbstractTableGateway {
     public function addtyreDetails($params)
     {
         $common = new CommonService;
-        if(isset($params['tyreBrand']) && trim($params['tyreBrand'])!="")
+        if(isset($params['tyreType']) && $params['tyreType']!="")
         {
-            $data = array(
-                'user_id' => base64_decode($params->ownerName),
-                'vehicle_id' => base64_decode($params->vehicleId),
-                'tyre' => $params->tyre,
-                'tyre_brand' => $params->tyreBrand,
-                'tyre_name' => $params->tyreName,
-                'tyre_size' => $params->tyreSize,
-                'rim_size' => $params->rimSize,
-                'tyre_life_remaining' => $params->tyreLife,
-                'date_of_parchase' => $common->dbDateFormat($params->dateParchase),
-                'tyre_side' => $params->tyreSide,
-                'tyre_type' => $params->tyreType
-            );
-            $this->insert($data);
-            $lastInsertedId = $this->lastInsertValue;
+            $n = count($params['vehicleId']);
+            for($i=0;$i<$n;$i++){
+                $data = array(
+                    'user_id' => base64_decode($params['ownerName'][$i]),
+                    'vehicle_id' => base64_decode($params['vehicleId'][$i]),
+                    'tyre' => $params['tyre'][$i],
+                    'tyre_brand' => $params['tyreBrand'][$i],
+                    'tyre_name' => $params['tyreName'][$i],
+                    'tyre_size' => $params['tyreSize'][$i],
+                    'rim_size' => $params['rimSize'][$i],
+                    'tyre_life_remaining' => $params['tyreLife'][$i],
+                    'date_of_parchase' => $common->dbDateFormat($params['dateParchase'][$i]),
+                    'tyre_side' => $params['tyreSide'][$i],
+                    'tyre_type' => $params['tyreType'],
+                );
+                // \Zend\Debug\Debug::dump($data);die;
+                $this->insert($data);
+                $lastInsertedId = $this->lastInsertValue;
+            }
         }
         return $lastInsertedId;
     }

@@ -17,7 +17,6 @@ class UserTable extends AbstractTableGateway {
     }
 
     public function userLoginDetailsInApi($params) {
-        \Zend\Debug\Debug::dump($params);die;
         $config = new \Zend\Config\Reader\Ini();
         $configResult = $config->fromFile(CONFIG_PATH . '/custom.config.ini');
         $common = new CommonService;

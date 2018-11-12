@@ -4,17 +4,15 @@ namespace Tyre\Controller;
 
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
+use Zend\Json\Json;
 
 class TyreController extends AbstractRestfulController
 {
     public function addAction() {
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $params = $request->getPost();
-            $tyreService = $this->getServiceLocator()->get('TyreService');
-            $response =$tyreService->addNewTyreDetailsAPI($params);
-            return new JsonModel($response);
-        }
+        $params = json_decode(file_get_contents('php://input'));
+        $tyreService = $this->getServiceLocator()->get('TyreService');
+        $response =$tyreService->addNewTyreDetailsAPI($params);
+        return new JsonModel($response);
     }
     
     public function getAction() {
@@ -23,13 +21,11 @@ class TyreController extends AbstractRestfulController
         $response =$tyreService->getTyreDetailsByIdAPI($params);
         return new JsonModel($response);
     }
+    
     public function updateAction() {
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $params = $request->getPost();
-            $tyreService = $this->getServiceLocator()->get('TyreService');
-            $response =$tyreService->updateExistsTyreDetails($params);
-            return new JsonModel($response);
-        }
+        $params = json_decode(file_get_contents('php://input'));
+        $tyreService = $this->getServiceLocator()->get('TyreService');
+        $response =$tyreService->updateExistsTyreDetails($params);
+        return new JsonModel($response);
     }
 }
