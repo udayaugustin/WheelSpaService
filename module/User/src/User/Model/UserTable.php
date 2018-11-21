@@ -17,14 +17,15 @@ class UserTable extends AbstractTableGateway {
     }
 
     public function userLoginDetailsInApi($params) {
+        // \Zend\Debug\Debug::dump($params);die;
         $config = new \Zend\Config\Reader\Ini();
         $configResult = $config->fromFile(CONFIG_PATH . '/custom.config.ini');
         $common = new CommonService;
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $password = sha1($params->password . $configResult["password"]["salt"]);
+        $password = sha1($params->Password . $configResult["password"]["salt"]);
 
-        $query = $sql->select()->from(array('ud' => 'user_details'))->where(array('username' => $params->username,'password' => $password))
+        $query = $sql->select()->from(array('ud' => 'user_details'))->where(array('username' => $params->UserName,'password' => $password))
                     ->join(array('r'=>'roles'),'ud.role_id=r.role_id',array('role_code'));
         $queryStr = $sql->getSqlStringForSqlObject($query);
         $rResult=$dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
@@ -42,10 +43,10 @@ class UserTable extends AbstractTableGateway {
                 $this->update($data,array('user_id'=>$rResult->user_id));
                 $response['status']='success';
                 $response['user-details']=array(
-                                            'userId' => $rResult->user_id,
-                                            'userName' => $rResult->username,
-                                            'roleCode' => $rResult->role_code,                                        
-                                            'authToken' => $authToken,                                        
+                                            'UserId' => $rResult->user_id,
+                                            'UserName' => $rResult->username,
+                                            'RoleCode' => $rResult->role_code,                                        
+                                            'AuthToken' => $authToken,                                        
                                         );
                 $response['message']='Logged in successfully';
             }
@@ -63,34 +64,52 @@ class UserTable extends AbstractTableGateway {
     public function addUserDetailsAPI($params)
     {   
         $common = new CommonService;
-        if(isset($params->userName) && trim($params->userName)!="")
+        if(isset($params->UserName) && trim($params->UserName)!="")
         {
             $dbAdapter = $this->adapter;
             $sql = new Sql($dbAdapter);
-
             $query = $sql->select()->from('user_details')
-                        ->where(array('username'=>$params->userName));
+            ->where(array('username'=>$params->UserName));
             $queryStr = $sql->getSqlStringForSqlObject($query);
             $rResult=$dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
             $authToken = $common->generateRandomString();
-
+            
+            // \Zend\Debug\Debug::dump($rResult->user_id);die;
             if(!isset($rResult->user_id) && trim($rResult->user_id) == ""){
                 $config = new \Zend\Config\Reader\Ini();
                 $configResult = $config->fromFile(CONFIG_PATH . '/custom.config.ini');
-                $password = sha1($params->password . $configResult["password"]["salt"]);
+                $password = sha1($params->Password . $configResult["password"]["salt"]);
                 $data = array(
-                    'username' => $params->userName,
-                    'role_id' => $params->roleId,
-                    'name' => $params->name,
+                    'username' => $params->UserName,
+                    'role_id' => $params->RoleId,
+                    'name' => $params->Name,
                     'password' => $password,    
-                    'phone' => $params->mobile,
-                    'user_dob' => $common->dbDateFormat($params['dob']),
-                    'pincode' => $params['pincode'],
-                    'state' => $params['state'],
-                    'city' => $params['city'],
-                    'street_address' => $params['address'],
+                    'phone' => $params->Mobile,
                     'auth_token' => $authToken,
                 );
+                if(isset($params->Dob) && trim($params->Dob) != ""){
+                    $data['user_dob'] = $common->dbDateFormat($params->Dob);
+                }
+                if(isset($params->Pincode) && trim($params->Pincode) != ""){
+                    $data['pincode'] = $params->Pincode;
+                }
+                if(isset($params->State) && trim($params->State) != ""){
+                    $data['state'] = $params->State;
+                }
+                if(isset($params->City) && trim($params->City) != ""){
+                    $data['city'] = $params->City;
+                }
+                if(isset($params->Address) && trim($params->Address) != ""){
+                    $data['street_address'] = $params->Address;
+                }
+                if(isset($params->Pincode) && trim($params->Pincode) != ""){
+                    $data['pincode'] = $params->Pincode;
+                }
+                if(isset($params->LoginType) && trim($params->LoginType) != ""){
+                    if($params->LoginType == 'facebook'){
+                        $data['user_status'] = 'active';
+                    }
+                }
                 $this->insert($data);
                 $lastInsertedId = $this->lastInsertValue;
                 if($lastInsertedId > 0){
@@ -112,10 +131,10 @@ class UserTable extends AbstractTableGateway {
     public function fetchUserDetailsByIdAPI($params) {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        if(isset($params->authToken) && trim($params->authToken) != ""){
+        if(isset($params->AuthToken) && trim($params->AuthToken) != ""){
             $userQuery = $sql->select()->from(array('ud' => 'user_details'))->columns(array('user_id','name','username','phone','user_dob','state','city','street_address','pincode','user_status'))
                             ->join(array('r'=>'roles'),'ud.role_id=r.role_id',array('role_code'))
-                            ->where(array('ud.auth_token' => $params->authToken));
+                            ->where(array('ud.auth_token' => $params->AuthToken));
             $userQueryStr = $sql->getSqlStringForSqlObject($userQuery);
             $userResult=$dbAdapter->query($userQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
             
@@ -149,28 +168,41 @@ class UserTable extends AbstractTableGateway {
         $sql = new Sql($dbAdapter);
         $common = new CommonService;
         //To check login credentials
-        $query = $sql->select()->from(array('ud' => 'user_details'))->where(array('auth_token' => $params->authToken,'user_status' => 'active'))
+        $query = $sql->select()->from(array('ud' => 'user_details'))->where(array('auth_token' => $params->AuthToken,'user_status' => 'active'))
                         ->join(array('r'=>'roles'),'ud.role_id=r.role_id',array('role_code'));
         $queryStr = $sql->getSqlStringForSqlObject($query);
         $rResult=$dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         
-        if(isset($params->userId) && trim($params->userId)!=""){
+        if(isset($rResult->user_id) && trim($rResult->user_id)!=""){
             $data = array(
-                'username' => $params->userName,
-                'role_id' => $params->roleId,
-                'name' => $params->name,
-                'phone' => $params->mobile,
-                'user_dob' => $common->dbDateFormat($params['dob']),
-                'pincode' => $params['pincode'],
-                'state' => $params['state'],
-                'city' => $params['city'],
-                'street_address' => $params['address'],
+                'username' => $params->UserName,
+                'role_id' => $params->RoleId,
+                'name' => $params->Name,
+                'phone' => $params->Mobile,
             );
-            if($params->password!=''){
-                $password = sha1($params->servPass . $configResult["password"]["salt"]);
-                $data->password = $password;
+            if(isset($params->Dob) && trim($params->Dob) != ""){
+                $data['user_dob'] = $common->dbDateFormat($params->Dob);
             }
-            $updateResult = $this->update($data,array('user_id'=>$params->userId));
+            if(isset($params->Pincode) && trim($params->Pincode) != ""){
+                $data['pincode'] = $params->Pincode;
+            }
+            if(isset($params->State) && trim($params->State) != ""){
+                $data['state'] = $params->State;
+            }
+            if(isset($params->City) && trim($params->City) != ""){
+                $data['city'] = $params->City;
+            }
+            if(isset($params->Address) && trim($params->Address) != ""){
+                $data['street_address'] = $params->Address;
+            }
+            if(isset($params->Pincode) && trim($params->Pincode) != ""){
+                $data['pincode'] = $params->Pincode;
+            }
+            if($params->Password!=''){
+                $password = sha1($params->ServPass . $configResult["password"]["salt"]);
+                $data['password'] = $password;
+            }
+            $updateResult = $this->update($data,array('user_id'=>$params->UserId));
             if($updateResult > 0){
                 $response['status'] = 'success';
                 $response['user-details'] = 'Data updated successfully';

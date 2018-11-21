@@ -2,6 +2,11 @@
 use Zend\Session\Container;
 $sessionLogin = new Container('credo');
 ?>
+<style>
+    a.btn.btn-round.btn-danger.btn-xs {
+        color: white;
+    }
+</style>
 <div class="bg-body-light">
      <div class="content content-full">
           <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center">
@@ -25,87 +30,190 @@ $sessionLogin = new Container('credo');
         <div class="block-content">
             <div class="col-md-12 table-responsive" id="hide">
                 <form name="userInformation" id="userInformation"  class="mb-5" action="<?php echo $this->url('admin', array('action' => 'add-user')); ?>" method="post">
-                    <div class="form-group row">
-                        <label class="col-sm-2 col-form-label" for="">Name<span class="mandatory">*</span></label>
-                        <div class="col-sm-4">
-                            <input type="text" class="form-control isRequired" id="name" name="name" placeholder="Enter the name" title="Please enter the name">
-                        </div>
+                    <div class="js-wizard-simple block block block-rounded block-bordered">
+                         <ul class="nav nav-tabs nav-tabs-block nav-justified" role="tablist">
+                              <li class="nav-item">
+                                   <a class="nav-link active" href="javascript:void()" id="step1" onclick="validateStep2()">Add User Details</a>
+                              </li>
+                              <li class="nav-item different">
+                                   <a class="nav-link" href="javascript:void()" id="step2" onclick="validateStep1();">Add Vehicle Details</a>
+                              </li>
+                         </ul>  
+                         <div class="block-content block-content-full tab-content" style="min-height: 300px;">
+                            <div class="tab-pane active" id="wizard-progress-step1" role="tabpanel">  
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label" for="">Name<span class="mandatory">*</span></label>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control isRequired" id="name" name="name" placeholder="Enter the name" title="Please enter the name">
+                                    </div>
 
-                        <label class="col-sm-2 col-form-label" for="">Role<span class="mandatory">*</span></label>
-                        <div class="col-sm-4">
-                            <select class="form-control isRequired" id="roleName" name="roleName" title="Please select the role name">
-                                <option value="">--Select--</option>
-                                <?php foreach($roleResult as $role){?>
-                                    <option value="<?php echo base64_encode($role['role_id']); ?>"><?php echo $role['role_name']; ?></option>
-                                <?php } ?>
-                            </select>
-                        </div>
-                    </div>
+                                    <label class="col-sm-2 col-form-label" for="">Role<span class="mandatory">*</span></label>
+                                    <div class="col-sm-4">
+                                        <select class="form-control isRequired" id="roleName" name="roleName" title="Please select the role name">
+                                            <option value="">--Select--</option>
+                                            <?php foreach($roleResult as $role){?>
+                                                <option value="<?php echo base64_encode($role['role_id']); ?>"><?php echo $role['role_name']; ?></option>
+                                            <?php } ?>
+                                        </select>
+                                    </div>
+                                </div>
 
-                    <div class="form-group row">
-                        <label class="col-sm-2 col-form-label" for="">Email<span class="mandatory">*</span></label>
-                        <div class="col-sm-4">
-                            <input type="email" class="form-control isRequired" id="email" name="email" placeholder="Enter the email" title="Please enter the email" onblur="checkNameValidation('user_details', 'username', this,null, 'The email that you entered already exists . Please try another name..');">
-                        </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label" for="">Email<span class="mandatory">*</span></label>
+                                    <div class="col-sm-4">
+                                        <input type="email" class="form-control isRequired" id="email" name="email" placeholder="Enter the email" title="Please enter the email" onblur="checkNameValidation('user_details', 'username', this,null, 'The email that you entered already exists . Please try another name..');">
+                                    </div>
 
-                        <label class="col-sm-2 col-form-label" for="">Password<span class="mandatory">*</span></label>
-                        <div class="col-sm-4">
-                            <input type="password" class="form-control isRequired" id="password" name="password" placeholder="Enter the Password" title="Please enter the password">
-                        </div>
-                    </div>
+                                    <label class="col-sm-2 col-form-label" for="">Password<span class="mandatory">*</span></label>
+                                    <div class="col-sm-4">
+                                        <input type="password" class="form-control isRequired" id="password" name="password" placeholder="Enter the Password" title="Please enter the password">
+                                    </div>
+                                </div>
 
-                    <div class="form-group row">
-                        <label class="col-sm-2 col-form-label" for="">Mobile<span class="mandatory">*</span></label>
-                        <div class="col-sm-4">
-                            <input type="number" class="form-control isRequired" id="mobile" name="mobile" placeholder="Enter the mobile" title="Please enter the mobile">
-                        </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label" for="">Mobile<span class="mandatory">*</span></label>
+                                    <div class="col-sm-4">
+                                        <input type="number" class="form-control isRequired" id="mobile" name="mobile" placeholder="Enter the mobile" title="Please enter the mobile">
+                                    </div>
 
-                        <label class="col-sm-2 col-form-label" for="">DOB</label>
-                        <div class="col-sm-4">
-                                <input type="text" class="js-datepicker form-control" id="dob" name="dob" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="dd-M-yyyy" placeholder="Enter the dob" title="Please enter the dob" readonly="readonly">
-                        </div>
-                    </div>
+                                    <label class="col-sm-2 col-form-label" for="">DOB</label>
+                                    <div class="col-sm-4">
+                                            <input type="text" class="js-datepicker form-control" id="dob" name="dob" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="dd-M-yyyy" placeholder="Enter the dob" title="Please enter the dob" readonly="readonly">
+                                    </div>
+                                </div>
 
-                    <div class="form-group row">
-                        <label class="col-sm-2 col-form-label" for="">State</label>
-                        <div class="col-sm-4">
-                            <select class="form-control" id="state" name="state" title="Please select the state">
-                                <option value="">--Select--</option>
-                                <?php foreach($stateResult as $state){?>
-                                    <option value="<?php echo $state['state_id']; ?>"><?php echo $state['state_name']; ?></option>
-                                <?php } ?>
-                            </select>
-                        </div>
-                       
-                        <label class="col-sm-2 col-form-label" for="">City</label>
-                        <div class="col-sm-4">
-                            <input type="text" class="form-control" id="city" name="city" placeholder="Enter the city" title="Please enter the city">
-                        </div>
-                    </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label" for="">State</label>
+                                    <div class="col-sm-4">
+                                        <select class="form-control" id="state" name="state" title="Please select the state">
+                                            <option value="">--Select--</option>
+                                            <?php foreach($stateResult as $state){?>
+                                                <option value="<?php echo $state['state_id']; ?>"><?php echo $state['state_name']; ?></option>
+                                            <?php } ?>
+                                        </select>
+                                    </div>
+                                
+                                    <label class="col-sm-2 col-form-label" for="">City</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" id="city" name="city" placeholder="Enter the city" title="Please enter the city">
+                                    </div>
+                                </div>
 
-                    <div class="form-group row">
-                        <label class="col-sm-2 col-form-label" for="">Pincode</label>
-                        <div class="col-sm-4">
-                            <input type="number" class="form-control" id="pincode" name="pincode" placeholder="Enter the pincode" title="Please enter the pincode">
-                        </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label" for="">Pincode</label>
+                                    <div class="col-sm-4">
+                                        <input type="number" class="form-control" id="pincode" name="pincode" placeholder="Enter the pincode" title="Please enter the pincode">
+                                    </div>
 
-                        <label class="col-sm-2 col-form-label" for="">Status<span class="mandatory">*</span></label>
-                        <div class="col-sm-4">
-                            <select class="form-control isRequired" id="userStatus" name="userStatus" title="Please select the user status">
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
-                        </div>
-                    </div>
+                                    <label class="col-sm-2 col-form-label" for="">Status<span class="mandatory">*</span></label>
+                                    <div class="col-sm-4">
+                                        <select class="form-control isRequired" id="userStatus" name="userStatus" title="Please select the user status">
+                                            <option value="active">Active</option>
+                                            <option value="inactive">Inactive</option>
+                                        </select>
+                                    </div>
+                                </div>
 
-                    <div class="form-group row">
-                        <label class="col-sm-2 col-form-label" for="">Address</label>
-                        <div class="col-sm-4">
-                            <textarea class="form-control" id="address" rows="4" cols="50" name="address" placeholder="Enter the address" title="Please enter the address"></textarea>
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label" for="">Address</label>
+                                    <div class="col-sm-4">
+                                        <textarea class="form-control" id="address" rows="4" cols="50" name="address" placeholder="Enter the address" title="Please enter the address"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="wizard-progress-step2" role="tabpanel">
+                                <table id="vehicleTable" class="table table-bordered table-condensed table">
+                                    <thead>
+                                        <tr>
+                                            <th>Vehicle Number</th>
+                                            <th>Vehicle Name</th>
+                                            <th>Vehicle Brand</th>
+                                            <th>Vehicle Model</th>
+                                            <th>Vehicle Type</th>
+                                            <th style="width: 110px !important;">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="form-group row">
+                                                    <label class="col-sm-2 col-form-label" for="">Number <span class="mandatory">*</span></label>
+                                                    <div class="col-sm-4">
+                                                        <input type="text" class="form-control" id="vehicleNumber1" name="vehicleNumber[]" placeholder="Enter number" title="Please enter number" onblur="checkNameValidation('vehicle_details', 'vehicle_no', this,null, 'The vehicle number that you entered already exists . Please try another number..'); checkVehicle('1',this);">
+                                                    </div>
+                                                    
+                                                    <label class="col-sm-2 col-form-label" for="">Name <span class="mandatory">*</span></label>
+                                                    <div class="col-sm-4">
+                                                        <input type="text" class="form-control" id="vehicleName1" name="vehicleName[]" placeholder="Enter name" title="Please enter name"">
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            <td>
+                                                <div class="form-group row">
+                                                    <label class="col-sm-2 col-form-label" for="">Brand <span class="mandatory">*</span></label>
+                                                    <div class="col-sm-4">
+                                                        <input type="text" class="form-control" id="vehicleBrand1" name="vehicleBrand[]" placeholder="Enter brand" title="Please enter brand"">
+                                                    </div>
+                                                    
+                                                    <label class="col-sm-2 col-form-label" for="">Model <span class="mandatory">*</span></label>
+                                                    <div class="col-sm-4">
+                                                        <input type="text" class="form-control" id="vehicleModel1" name="vehicleModel[]" placeholder="Enter model" title="Please enter model"">
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            <td>
+                                                <div class="form-group row">
+                                                    <label class="col-sm-2 col-form-label" for="">Type <span class="mandatory">*</span></label>
+                                                    <div class="col-sm-4">
+                                                        <input type="text" class="form-control" id="vehicleType1" name="vehicleType[]" placeholder="Enter type" title="Please enter type"">
+                                                    </div>
+                                                    
+                                                    <label class="col-sm-2 col-form-label" for="">Version <span class="mandatory">*</span></label>
+                                                    <div class="col-sm-4">
+                                                        <input type="text" class="form-control" id="vehicleVersion1" name="vehicleVersion[]" placeholder="Enter version" title="Please enter version"">
+                                                    </div>
+                                                </div>
+                                            </td>
+                                           
+                                            <td>
+                                                <div class="form-group row">
+                                                    <label class="col-sm-2 col-form-label" for="">Year of Purchase <span class="mandatory">*</span></label>
+                                                    <div class="col-sm-4">
+                                                        <input type="text" class="form-control" id="yearPurchase1" name="yearPurchase[]" placeholder="Enter purchase" title="Please enter purchase"">
+                                                    </div>
+                                                    
+                                                    <label class="col-sm-2 col-form-label" for="">K.M Car Done So Far
+                                                        
+                                                    </label>
+                                                    <div class="col-sm-4">
+                                                        <input type="text" class="form-control" id="kmDone1" name="kmDone[]" placeholder="Enter K.M car done so far" title="Please enter K.M car done so far"">
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            
+                                            <td>
+                                                <div class="form-group row">
+                                                    <label class="col-sm-2 col-form-label" for="">Average Drive Per Week</label>
+                                                    <div class="col-sm-4">
+                                                        <input type="text" class="form-control" id="avgDrive1" name="avgDrive[]" placeholder="Enter average drive per week" title="Please enter average drive per week"">
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            <td style="text-align: center">
+                                                <a href="javascript:void(0);" class="btn btn-info btn-xs" onclick= "insRow()";><i class="fa fa-plus"> </i></a>&nbsp;<a class="btn btn-round btn-danger btn-xs" onclick= "removeRow(this.parentNode.parentNode);"><i class="fa fa-minus"> </i></a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>  
+                            </div>   
                         </div>
-                    </div>
-                    
-                    <div class="row items-push">
+                    </div>               
+                    <button type="button" class="btn btn-secondary btnHide" onclick="validateStep2()" style="display:none;"><i class="fa fa-angle-left mr-1"></i> Previous</button>
+                    <button type="button" class="btn btn-secondary nxtBtn" onclick="validateStep1()" style=" float: right; ">Next <i class="fa fa-angle-right ml-1"></i></button>
+                    <div class="row items-push" style="display:none;">
                         <div class="col-lg-7 offset-lg-4">
                             <a href="<?php echo $this->url('admin', array('action' => 'user')); ?>" class="btn btn-danger">Cancel</a>&nbsp;
                             <button type="submit" class="btn btn-primary" onclick="validateNow();return false;"><i class="fa fa-fw fa-check"></i> Submit</button>
@@ -118,6 +226,23 @@ $sessionLogin = new Container('credo');
 </div>
 <script type="text/javascript">
     duplicateName = true;
+    var rowCount=1;
+
+    function checkVehicle(row,obj){
+		var nrl = document.getElementById("vehicleTable").rows.length;
+        for(var i=1; i <= nrl; i++){
+            if(obj.id != "vehicleNumber"+i){
+                //$("#userId"+i+row).val();
+                if(obj.value == $("#vehicleNumber"+i).val()){
+                    alert("Number already enter, Please choose another",'error');
+                    obj.value="";
+                    break;
+                }
+            }
+        }
+
+	}
+
     function validateNow() {
         flag = deforayValidator.init({
             formId: 'userInformation'
@@ -145,5 +270,75 @@ $sessionLogin = new Container('credo');
                 }
             });
         }
+    }
+
+    function insRow() {
+          ++rowCount;
+         
+          rl = document.getElementById("vehicleTable").rows.length;
+          var a = document.getElementById("vehicleTable").insertRow(rl);
+          a.setAttribute("style", "display:none;");
+          a.setAttribute("class", "data");
+          var b = a.insertCell(0);
+          var c = a.insertCell(1);
+          var d = a.insertCell(2);
+          var e = a.insertCell(3);
+          var f = a.insertCell(4);
+          var g = a.insertCell(5);
+
+          c.setAttribute("align", "center");
+
+          b.innerHTML = '<input type="text" class="form-control isRequired" id="vehicleNumber' + rowCount + '" name="vehicleNumber[]" placeholder="Enter number" title="Please enter number" onblur="checkNameValidation("vehicle_details", "vehicle_no", this,null, "The vehicle number that you entered already exists . Please try another number.."); checkVehicle(' + rowCount + ',this);">';
+          c.innerHTML = '<input type="text" class="form-control isRequired" id="vehicleName' + rowCount + '" name="vehicleName[]" placeholder="Enter name" title="Please enter name"">';
+          d.innerHTML = '<input type="text" class="form-control isRequired" id="vehicleBrand' + rowCount + '" name="vehicleBrand[]" placeholder="Enter brand" title="Please enter brand"">';
+          e.innerHTML = '<input type="text" class="form-control isRequired" id="vehicleModel' + rowCount + '" name="vehicleModel[]" placeholder="Enter model" title="Please enter model"">';
+          f.innerHTML = '<input type="text" class="form-control isRequired" id="vehicleType' + rowCount + '" name="vehicleType[]" placeholder="Enter type" title="Please enter type"">';
+          g.innerHTML = '<a href="javascript:void(0);" class="btn btn-info btn-xs" id="addBlock" onclick= "insRow()";><i class="fa fa-plus"> </i></a>&nbsp;<a class="btn btn-round btn-danger btn-xs" onclick= "removeRow(this.parentNode.parentNode);"><i class="fa fa-minus"> </a>';
+
+          $(a).fadeIn(800);
+     }
+
+     function removeRow(el) {
+          $(el).fadeOut("slow", function() {
+               el.parentNode.removeChild(el);
+               rl = document.getElementById("vehicleTable").rows.length;
+               if (rl == 1) {
+                    insRow();
+               }
+          });
+     }
+
+     function validateStep1()
+    {
+        flag = deforayValidator.init({
+            formId: 'userInformation'
+        });
+        if (flag) {
+
+            $("#step1,#wizard-progress-step1").removeClass("active");
+            $("#step2,#wizard-progress-step2").addClass("active");
+
+            $(".btnHide").show();
+            $(".nxtBtn").hide();
+            $('.submit').show();
+        }else{
+            $('.submit').hide();
+            $(".btnHide").hide();
+        }
+    }
+    function validateStep2()
+    {
+        $("#vehicleNumber1").removeClass("isRequired");
+        $("#vehicleName1").removeClass("isRequired");
+        $("#vehicleBrand1").removeClass("isRequired");
+        $("#vehicleModel1").removeClass("isRequired");
+        $("#vehicleType1").removeClass("isRequired");
+
+        $("#step1,#wizard-progress-step1").addClass("active");
+        $("#step2,#wizard-progress-step2").removeClass("active");
+
+        $(".btnHide").hide();
+        $(".nxtBtn").show();
+        $('.submit').hide();
     }
 </script>

@@ -11,7 +11,7 @@ use Tyre\Service\CommonService;
 
 class TyreTable extends AbstractTableGateway {
 
-    protected $table = 'tyre_details';
+    protected $table = 'front_tyre_details';
 
     public function __construct(Adapter $adapter) {
         $this->adapter = $adapter;
@@ -19,35 +19,60 @@ class TyreTable extends AbstractTableGateway {
 
     public function addTyreDetailsAPI($params)
     {   
+        $backTyreDb = new BackTyreTable($this->adapter);
         $common = new CommonService;
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $query = $sql->select()->from(array('ud' => 'user_details'))->where(array('auth_token' => $params->authToken,'user_status' => 'active'))
+        $query = $sql->select()->from(array('ud' => 'user_details'))->where(array('auth_token' => $params->AuthToken,'user_status' => 'active'))
                             ->join(array('r'=>'roles'),'ud.role_id=r.role_id',array('role_code'));
         $queryStr = $sql->getSqlStringForSqlObject($query);
         $rResult=$dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-        if(isset($params->tyreBrand) && trim($params->tyreBrand) != ""){
+        if(isset($params->TyreType) && trim($params->TyreType) != ""){
             if( isset($rResult->user_id) && trim($rResult->user_id) != "" ){
                 $data = array(
                     'user_id' => $rResult->user_id,
-                    'vehicle_id' => $params->vehicleId,
-                    'tyre' => $params->tyre,
-                    'tyre_brand' => $params->tyreBrand,
-                    'tyre_name' => $params->tyreName,
-                    'tyre_size' => $params->tyreSize,
-                    'rim_size' => $params->rimSize,
-                    'tyre_life_remaining' => $params->tyreLife,
-                    'date_of_parchase' => $common->dbDateFormat($params->dateParchase),
-                    'tyre_side' => $params->tyreSide,
-                    'tyre_type' => $params->tyreType
+                    'vehicle_id' => $params->VehicleId[0],
+                    'tyre' => $params->Tyre[0],
+                    'tyre_brand' => $params->TyreBrand[0],
+                    'tyre_name' => $params->TyreName[0],
+                    'tyre_size' => $params->TyreSize[0],
+                    'rim_size' => $params->RimSize[0],
+                    'tyre_life_remaining' => $params->TyreLife[0],
+                    'date_of_parchase' => $common->dbDateFormat($params->DateParchase[0]),
+                    'tyre_side' => $params->TyreSide[0],
+                    'tyre_type' => $params->TyreType
                 );
-                // \Zend\Debug\Debug::dump($data);die;
                 $this->insert($data);
                 $lastInsertedId = $this->lastInsertValue;
                 if($lastInsertedId > 0){
-                    $response['status'] = 'success';
-                    $response['message'] ='succesffuly added';
-                }else{
+                    if($params->TyreType == "different"){
+                        $backData = array(
+                            'front_tyre_id' => $lastInsertedId,
+                            'vehicle_id' => $params->VehicleId[1],
+                            'tyre' => $params->Tyre[1],
+                            'tyre_brand' => $params->TyreBrand[1],
+                            'tyre_name' => $params->TyreName[1],
+                            'tyre_size' => $params->TyreSize[1],
+                            'rim_size' => $params->RimSize[1],
+                            'tyre_life_remaining' => $params->TyreLife[1],
+                            'date_of_parchase' => $common->dbDateFormat($params->DateParchase[1]),
+                            'tyre_side' => $params->TyreSide[1]
+                        );
+                        $backTyreDb->insert($backData);
+                        $lastInsertedBackTyreId = $backTyreDb->lastInsertValue;
+                        if($lastInsertedBackTyreId > 0){
+                            $response['status'] = 'success';
+                            $response['message'] ='succesffuly added';
+                        }else{
+                            $response['status'] = 'failed';
+                            $response['message'] ='Not added try again';
+                        }
+                    }else{
+                        $response['status'] = 'success';
+                        $response['message'] ='succesffuly added';
+                    }
+                }
+                else{
                     $response['status'] = 'failed';
                     $response['message'] ='Not added try again';
                 }
@@ -65,8 +90,8 @@ class TyreTable extends AbstractTableGateway {
     public function fetchtyreDetailsByIdAPI($params) {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        if(isset($params->authToken) && trim($params->authToken) != ""){
-            $query = $sql->select()->from(array('ud' => 'user_details'))->where(array('auth_token' => $params->authToken,'user_status' => 'active'))
+        if(isset($params->AuthToken) && trim($params->AuthToken) != ""){
+            $query = $sql->select()->from(array('ud' => 'user_details'))->where(array('auth_token' => $params->AuthToken,'user_status' => 'active'))
                                 ->join(array('r'=>'roles'),'ud.role_id=r.role_id',array('role_code'));
             $queryStr = $sql->getSqlStringForSqlObject($query);
             $rResult=$dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
@@ -81,7 +106,7 @@ class TyreTable extends AbstractTableGateway {
             }else if(isset($rResult->role_code) && $rResult->role_code =='user'){
                 $tyreQuery = $sql->select()->from(array('td' => 'tyre_details'))->columns(array('*'))
                                     ->join(array('ud'=>'user_details'),'ud.user_id=td.user_id',array('name'))
-                                    ->where(array('ud.auth_token' => $params->authToken));
+                                    ->where(array('ud.auth_token' => $params->AuthToken));
                 $tyreQueryStr = $sql->getSqlStringForSqlObject($tyreQuery);
                 $tyreResult=$dbAdapter->query($tyreQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 if(isset($tyreResult) && trim($tyreResult) != ""){
@@ -104,46 +129,63 @@ class TyreTable extends AbstractTableGateway {
 
     public function updateTyreDetails($params)
     {
+        $backTyreDb = new BackTyreTable($this->adapter);
         $common = new CommonService;
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $query = $sql->select()->from(array('ud' => 'user_details'))->where(array('auth_token' => $params->authToken));
+        $query = $sql->select()->from(array('ud' => 'user_details'))->where(array('auth_token' => $params->AuthToken));
         $queryStr = $sql->getSqlStringForSqlObject($query);
         $rResult=$dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
 
         if(isset($rResult->user_status) && $rResult->user_status == 'active'){
             
-            if(isset($params->tyreId) && trim($params->tyreId)!="")
+            if(isset($params->TyreId) && trim($params->TyreId)!="")
             {
                 $data = array(
                     'user_id' => $rResult->user_id,
-                    'vehicle_id' => $params->vehicleId,
-                    'tyre' => $params->tyre,
-                    'tyre_brand' => $params->tyreBrand,
-                    'tyre_name' => $params->tyreName,
-                    'tyre_size' => $params->tyreSize,
-                    'rim_size' => $params->rimSize,
-                    'tyre_life_remaining' => $params->tyreLife,
-                    'date_of_parchase' => $common->dbDateFormat($params->dateParchase),
-                    'tyre_side' => $params->tyreSide,
-                    'tyre_type' => $params->tyreType
+                    'vehicle_id' => $params->VehicleId[0],
+                    'tyre' => $params->Tyre[0],
+                    'tyre_brand' => $params->TyreBrand[0],
+                    'tyre_name' => $params->TyreName[0],
+                    'tyre_size' => $params->TyreSize[0],
+                    'rim_size' => $params->RimSize[0],
+                    'tyre_life_remaining' => $params->TyreLife[0],
+                    'date_of_parchase' => $common->dbDateFormat($params->DateParchase[0]),
+                    'tyre_side' => $params->TyreSide[0],
+                    'tyre_type' => $params->TyreType
                 );
-                $updateResult = $this->update($data,array('tyre_id'=>$params->tyreId));
-
-                if($updateResult > 0){
-                    $response['status'] = 'success';
-                    $response['tyre-details'] = 'Data updated successfully';
+                $updateResult = $this->update($data,array('tyre_id'=>$params->TyreId));
+                if($params->TyreType == "different"){
+                    $backData = array(
+                        'vehicle_id' => $params->VehicleId[1],
+                        'tyre' => $params->Tyre[1],
+                        'tyre_brand' => $params->TyreBrand[1],
+                        'tyre_name' => $params->TyreName[1],
+                        'tyre_size' => $params->TyreSize[1],
+                        'rim_size' => $params->RimSize[1],
+                        'tyre_life_remaining' => $params->TyreLife[1],
+                        'date_of_parchase' => $common->dbDateFormat($params->DateParchase[1]),
+                        'tyre_side' => $params->TyreSide[1]
+                    );
+                    $lastInsertedBackTyreId = $backTyreDb->update($backData,array('front_tyre_id'=>$params->TyreId));
+                    if($lastInsertedBackTyreId > 0 || $updateResult > 0){
+                        $response['status'] = 'success';
+                        $response['message'] ='Data updated successfully';
+                    }else{
+                        $response['status'] = 'failed';
+                        $response['message'] ='No update found';
+                    }
                 }else{
-                    $response['status'] = 'failed';
-                    $response['tyre-details'] =     'No updates found';
+                    $response['status'] = 'success';
+                    $response['message'] ='Data updated successfully';
                 }
             }else{
                 $response['status'] = 'failed';
-                $response['tyre-details'] = 'tyre not found';
+                $response['message'] = 'tyre not found';
             }
         }else{
             $response['status'] = 'failed';
-            $response['tyre-details'] = 'You are not have privillage to update';
+            $response['message'] = 'You are not have privillage to update';
         }
         return $response;
     }

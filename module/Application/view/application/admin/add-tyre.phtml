@@ -38,10 +38,10 @@ $sessionLogin = new Container('credo');
                     <div class="js-wizard-simple block block block-rounded block-bordered">
                          <ul class="nav nav-tabs nav-tabs-block nav-justified" role="tablist">
                               <li class="nav-item">
-                                   <a class="nav-link active" href="javascript:void()" id="step1" onclick="validateStep2()">Same Type</a>
+                                   <a class="nav-link active" href="javascript:void()" id="step1" onclick="validateStep2()">Front</a>
                               </li>
                               <li class="nav-item different" style="display:none;">
-                                   <a class="nav-link" href="javascript:void()" id="step2" onclick="validateStep1();">Different Type</a>
+                                   <a class="nav-link" href="javascript:void()" id="step2" onclick="validateStep1();">Back</a>
                               </li>
                          </ul>
                          <div class="block-content block-content-full tab-content" style="min-height: 300px;">
@@ -56,19 +56,7 @@ $sessionLogin = new Container('credo');
                                             <?php } ?>
                                         </select>
                                     </div>
-            
-                                    <label class="col-sm-2 col-form-label" for="">Select Owner<span class="mandatory">*</span></label>
-                                    <div class="col-sm-4">
-                                        <select class="form-control isRequired" id="ownerName1" name="ownerName[]" title="Please select the owner name">
-                                            <option value="">--Select--</option>
-                                            <?php foreach($userResult as $user){?>
-                                                <option value="<?php echo base64_encode($user['user_id']); ?>"><?php echo $user['name']; ?></option>
-                                            <?php } ?>
-                                        </select>
-                                    </div>
-                                </div>
-                                
-                                <div class="form-group row">
+
                                     <label class="col-sm-2 col-form-label" for="">Tyre<span class="mandatory">*</span></label>
                                     <div class="col-sm-4">
                                         <select class="form-control isRequired" id="tyre1" name="tyre[]" title="Please select the tyre">
@@ -76,38 +64,38 @@ $sessionLogin = new Container('credo');
                                             <option value="old">Old</option>
                                         </select>
                                     </div>
-            
+                                </div>
+                                
+                                <div class="form-group row">
                                     <label class="col-sm-2 col-form-label" for="">Tyre Brand<span class="mandatory">*</span></label>
                                     <div class="col-sm-4">
                                         <input type="text" class="form-control isRequired" id="tyreBrand1" name="tyreBrand[]" placeholder="Enter the brand" title="Please enter the brand">
                                     </div>
-                                </div>
-                                
-                                <div class="form-group row">
+
                                     <label class="col-sm-2 col-form-label" for="">Tyre Name<span class="mandatory">*</span></label>
                                     <div class="col-sm-4">
                                         <input type="text" class="form-control isRequired" id="tyreName1" name="tyreName[]" placeholder="Enter the name" title="Please enter the name">
                                     </div>
-            
+                                </div>
+                                
+                                <div class="form-group row">
                                     <label class="col-sm-2 col-form-label" for="">Date Of Parchase</label>
                                     <div class="col-sm-4">
                                         <input type="text" class="js-datepicker form-control" id="dateParchase1" name="dateParchase[]" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="dd-M-yyyy" placeholder="Enter the date of parchase" title="Please enter the date of parchase" readonly="readonly">
                                     </div>
-                                </div>
-                                
-                                <div class="form-group row">
+
                                     <label class="col-sm-2 col-form-label" for="">Tyre Size</label>
                                     <div class="col-sm-4">
                                         <input type="text" class="form-control" id="tyreSize1" name="tyreSize[]" placeholder="Enter the size" title="Please enter the size">   
                                     </div>
-            
+                                </div>
+                                
+                                <div class="form-group row">
                                     <label class="col-sm-2 col-form-label" for="">Tyre Life Remaining</label>
                                     <div class="col-sm-4">
                                         <input type="text" class="form-control" id="tyreLife1" name="tyreLife[]" placeholder="Enter the tyre life" title="Please enter the tyre life">
                                     </div>
-                                </div>
-                                
-                                <div class="form-group row">
+
                                     <label class="col-sm-2 col-form-label" for="">Tyre Side<span class="mandatory">*</span></label>
                                     <div class="col-sm-4">
                                         <select class="form-control isRequired" id="tyreSide1" name="tyreSide[]" title="Please select the tyre side">
@@ -115,7 +103,9 @@ $sessionLogin = new Container('credo');
                                             <option value="back">Back</option>
                                         </select>
                                     </div>
-            
+                                </div>
+                                
+                                <div class="form-group row">
                                     <label class="col-sm-2 col-form-label" for="">Rim Size</label>
                                     <div class="col-sm-4">
                                         <input type="text" class="form-control" id="rimSize1" name="rimSize[]" placeholder="Enter the rim size" title="Please enter the rim size">   
@@ -135,18 +125,6 @@ $sessionLogin = new Container('credo');
                                         </select>
                                     </div>
 
-                                    <label class="col-sm-2 col-form-label" for="">Select Owner<span class="mandatory">*</span></label>
-                                    <div class="col-sm-4">
-                                        <select class="form-control" id="ownerName2" name="ownerName[]" title="Please select the owner name">
-                                            <option value="">--Select--</option>
-                                            <?php foreach($userResult as $user){?>
-                                                <option value="<?php echo base64_encode($user['user_id']); ?>"><?php echo $user['name']; ?></option>
-                                            <?php } ?>
-                                        </select>
-                                    </div>
-                                </div>
-                                
-                                <div class="form-group row">
                                     <label class="col-sm-2 col-form-label" for="">Tyre<span class="mandatory">*</span></label>
                                     <div class="col-sm-4">
                                         <select class="form-control" id="tyre2" name="tyre[]" title="Please select the tyre">
@@ -154,38 +132,38 @@ $sessionLogin = new Container('credo');
                                             <option value="old">Old</option>
                                         </select>
                                     </div>
-
+                                </div>
+                                
+                                <div class="form-group row">
                                     <label class="col-sm-2 col-form-label" for="">Tyre Brand<span class="mandatory">*</span></label>
                                     <div class="col-sm-4">
                                         <input type="text" class="form-control" id="tyreBrand2" name="tyreBrand[]" placeholder="Enter the brand" title="Please enter the brand">
                                     </div>
-                                </div>
-                                
-                                <div class="form-group row">
+
                                     <label class="col-sm-2 col-form-label" for="">Tyre Name<span class="mandatory">*</span></label>
                                     <div class="col-sm-4">
                                         <input type="text" class="form-control" id="tyreName2" name="tyreName[]" placeholder="Enter the name" title="Please enter the name">
                                     </div>
-
+                                </div>
+                                
+                                <div class="form-group row">
                                     <label class="col-sm-2 col-form-label" for="">Date Of Parchase</label>
                                     <div class="col-sm-4">
                                         <input type="text" class="js-datepicker form-control" id="dateParchase2" name="dateParchase[]" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="dd-M-yyyy" placeholder="Enter the date of parchase" title="Please enter the date of parchase" readonly="readonly">
                                     </div>
-                                </div>
-                                
-                                <div class="form-group row">
+
                                     <label class="col-sm-2 col-form-label" for="">Tyre Size</label>
                                     <div class="col-sm-4">
                                         <input type="text" class="form-control" id="tyreSize2" name="tyreSize[]" placeholder="Enter the size" title="Please enter the size">   
                                     </div>
-
+                                </div>
+                                
+                                <div class="form-group row">
                                     <label class="col-sm-2 col-form-label" for="">Tyre Life Remaining</label>
                                     <div class="col-sm-4">
                                         <input type="text" class="form-control" id="tyreLife2" name="tyreLife[]" placeholder="Enter the tyre life" title="Please enter the tyre life">
                                     </div>
-                                </div>
-                                
-                                <div class="form-group row">
+
                                     <label class="col-sm-2 col-form-label" for="">Tyre Side<span class="mandatory">*</span></label>
                                     <div class="col-sm-4">
                                         <select class="form-control" id="tyreSide2" name="tyreSide[]" title="Please select the tyre side">
@@ -193,7 +171,9 @@ $sessionLogin = new Container('credo');
                                             <option value="back">Back</option>
                                         </select>
                                     </div>
-
+                                </div>
+                                                              
+                                <div class="form-group row">
                                     <label class="col-sm-2 col-form-label" for="">Rim Size</label>
                                     <div class="col-sm-4">
                                         <input type="text" class="form-control" id="rimSize2" name="rimSize[]" placeholder="Enter the rim size" title="Please enter the rim size">   
@@ -317,6 +297,11 @@ $sessionLogin = new Container('credo');
             $('.nxtBtn').hide();
             $('.submit').show();
         }
+    }
+
+    function selectOwner(obj){
+        $('#ownerName2').val(obj.value);
+        $('#ownerName2').prop('disabled',true);
     }
 
 </script>
