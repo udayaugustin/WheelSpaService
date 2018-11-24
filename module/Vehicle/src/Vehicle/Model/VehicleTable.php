@@ -18,41 +18,49 @@ class VehicleTable extends AbstractTableGateway {
 
     public function addVehicleDetailsAPI($params)
     {   
-        if(isset($params->vehicleNo) && trim($params->vehicleNo)!="")
+        if(isset($params->VehicleNo) && trim($params->VehicleNo)!="")
         {
             $dbAdapter = $this->adapter;
             $sql = new Sql($dbAdapter);
 
             $query = $sql->select()->from('vehicle_details')
-                        ->where(array('vehicle_no'=>$params->vehicleNo));
+                        ->where(array('vehicle_no'=>$params->VehicleNo));
             $queryStr = $sql->getSqlStringForSqlObject($query);
             $rResult=$dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
 
             if(!isset($rResult->vehicle_id) && trim($rResult->vehicle_id) == ""){
                 $data = array(
-                    'vehicle_no' => $params->vehicleNo,
-                    'user_id' => $params->userId,
-                    'vehicle_name' => $params->vehicleName,
-                    'vehicle_brand' => $params->vehicleBrand,
-                    'vehicle_model' => $params->vehicleModel,
-                    'vehicle_type' => $params->vehicleType,
-                    'vehicle_version' => $params->vehicleVersion,
-                    'year_of_purchase' => $params->yearPurchase,
-                    'km_done' => $params->kmDone,
-                    'avg_drive_per_week' => $params->avgDrive
+                    'vehicle_no' => $params->VehicleNo,
+                    'user_id' => $params->UserId,
+                    'vehicle_name' => $params->VehicleName,
+                    'vehicle_brand' => $params->VehicleBrand,
+                    'vehicle_model' => $params->VehicleModel,
+                    'vehicle_type' => $params->VehicleType
                 );
+                if(isset($params->VehicleVersion) && trim($params->VehicleVersion) != ""){
+                    $data['vehicle_version'] = $params->VehicleVersion;
+                }
+                if(isset($params->YearPurchase) && trim($params->YearPurchase) != ""){
+                    $data['year_of_purchase'] = $params->YearPurchase;
+                }
+                if(isset($params->KmDone) && trim($params->KmDone) != ""){
+                    $data['km_done'] = $params->KmDone;
+                }
+                if(isset($params->AvgDrive) && trim($params->AvgDrive) != ""){
+                    $data['avg_drive_per_week'] = $params->AvgDrive;
+                }
                 $this->insert($data);
                 $lastInsertedId = $this->lastInsertValue;
                 if($lastInsertedId > 0){
-                    $response['status'] = 'success';
-                    $response['message'] ='succesffuly added';
+                    $response['Status'] = 'success';
+                    $response['Message'] ='succesffuly added';
                 }else{
-                    $response['status'] = 'failed';
-                    $response['message'] ='Not added try again';
+                    $response['Status'] = 'failed';
+                    $response['Message'] ='Not added try again';
                 }
             }else{
-                $response['status'] = 'failed';
-                $response['message'] ='vehicle no already exists';
+                $response['Status'] = 'failed';
+                $response['Message'] ='vehicle no already exists';
             }
         }
         return $response;
@@ -61,8 +69,8 @@ class VehicleTable extends AbstractTableGateway {
     public function fetchVehicleDetailsByIdAPI($params) {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        if(isset($params->authToken) && trim($params->authToken) != ""){
-            $query = $sql->select()->from(array('ud' => 'user_details'))->where(array('auth_token' => $params->authToken,'user_status' => 'active'))
+        if(isset($params->AuthToken) && trim($params->AuthToken) != ""){
+            $query = $sql->select()->from(array('ud' => 'user_details'))->where(array('auth_token' => $params->AuthToken,'user_status' => 'active'))
                                 ->join(array('r'=>'roles'),'ud.role_id=r.role_id',array('role_code'));
             $queryStr = $sql->getSqlStringForSqlObject($query);
             $rResult=$dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
@@ -73,27 +81,27 @@ class VehicleTable extends AbstractTableGateway {
                 $vehicleResult=$dbAdapter->query($vehicleQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 
                 $response['status'] = 'success';
-                $response['vehicle-details'] = $vehicleResult;
+                $response['VehicleDetails'] = $vehicleResult;
             }else if(isset($rResult->role_code) && $rResult->role_code =='user'){
                 $vehicleQuery = $sql->select()->from(array('vd' => 'vehicle_details'))->columns(array('*'))
                                     ->join(array('ud'=>'user_details'),'ud.user_id=vd.user_id',array('name'))
-                                    ->where(array('ud.auth_token' => $params->authToken));
+                                    ->where(array('ud.auth_token' => $params->AuthToken));
                 $vehicleQueryStr = $sql->getSqlStringForSqlObject($vehicleQuery);
                 $vehicleResult=$dbAdapter->query($vehicleQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 if(isset($vehicleResult) && trim($vehicleResult)     != ""){
-                    $response['status'] = 'success';
-                    $response['vehicle-details'] = $vehicleResult;
+                    $response['Status'] = 'success';
+                    $response['VehicleDetails'] = $vehicleResult;
                 }else{
-                    $response['status']='fail';
-                    $response['message']="No vehicle found for this user";    
+                    $response['Status']='fail';
+                    $response['Message']="No vehicle found for this user";    
                 }
             }else{
-                $response['status']='fail';
-                $response['message']="No vehicle found for this user";    
+                $response['Status']='fail';
+                $response['Message']="User not found";    
             }
         }else {
-            $response['status']='fail';
-            $response['message']="No data found";
+            $response['Status']='fail';
+            $response['Message']="No data found";
         }
         return $response;
     }
@@ -103,42 +111,50 @@ class VehicleTable extends AbstractTableGateway {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
 
-        $query = $sql->select()->from(array('ud' => 'user_details'))->where(array('auth_token' => $params->authToken));
+        $query = $sql->select()->from(array('ud' => 'user_details'))->where(array('auth_token' => $params->AuthToken));
         $queryStr = $sql->getSqlStringForSqlObject($query);
         $rResult=$dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
 
         if(isset($rResult->user_status) && $rResult->user_status == 'active'){
             
-            if(isset($params->vehicleId) && trim($params->vehicleId)!="")
+            if(isset($params->VehicleId) && trim($params->VehicleId)!="")
             {
                 $data = array(
-                    'vehicle_no' => $params->vehicleNo,
-                    'user_id' => $params->userId,
-                    'vehicle_name' => $params->vehicleName,
-                    'vehicle_brand' => $params->vehicleBrand,
-                    'vehicle_model' => $params->vehicleModel,
-                    'vehicle_type' => $params->vehicleType,
-                    'vehicle_version' => $params->vehicleVersion,
-                    'year_of_purchase' => $params->yearPurchase,
-                    'km_done' => $params->kmDone,
-                    'avg_drive_per_week' => $params->avgDrive
+                    'vehicle_no' => $params->VehicleNo,
+                    'user_id' => $params->UserId,
+                    'vehicle_name' => $params->VehicleName,
+                    'vehicle_brand' => $params->VehicleBrand,
+                    'vehicle_model' => $params->VehicleModel,
+                    'vehicle_type' => $params->VehicleType
                 );
-                $updateResult = $this->update($data,array('vehicle_id'=>$params->vehicleId));
+                if(isset($params->VehicleVersion) && trim($params->VehicleVersion) != ""){
+                    $data['vehicle_version'] = $params->VehicleVersion;
+                }
+                if(isset($params->YearPurchase) && trim($params->YearPurchase) != ""){
+                    $data['year_of_purchase'] = $params->YearPurchase;
+                }
+                if(isset($params->KmDone) && trim($params->KmDone) != ""){
+                    $data['km_done'] = $params->KmDone;
+                }
+                if(isset($params->AvgDrive) && trim($params->AvgDrive) != ""){
+                    $data['avg_drive_per_week'] = $params->AvgDrive;
+                }
+                $updateResult = $this->update($data,array('vehicle_id'=>$params->VehicleId));
 
                 if($updateResult > 0){
-                    $response['status'] = 'success';
-                    $response['vehicle-details'] = 'Data updated successfully';
+                    $response['Status'] = 'success';
+                    $response['VehicleDetails'] = 'Data updated successfully';
                 }else{
-                    $response['status'] = 'failed';
-                    $response['Vehicle-details'] = 'No updates found';
+                    $response['Status'] = 'failed';
+                    $response['VehicleDetails'] = 'No updates found';
                 }
             }else{
-                $response['status'] = 'failed';
-                $response['Vehicle-details'] = 'Vehicle not found';
+                $response['Status'] = 'failed';
+                $response['VehicleDetails'] = 'Vehicle not found';
             }
         }else{
-            $response['status'] = 'failed';
-            $response['Vehicle-details'] = 'You are not have privillage to update';
+            $response['Status'] = 'failed';
+            $response['VehicleDetails'] = 'You are not have privillage to update';
         }
         return $response;
     }

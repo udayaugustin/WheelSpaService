@@ -3,6 +3,7 @@ namespace Tyre;
 
 // Models
 use Tyre\Model\TyreTable;
+use Tyre\Model\BackTyreTable;
 
 // Service
 use Tyre\Service\TyreService;
@@ -17,6 +18,11 @@ class Module
                 'TyreTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                     $table = new TyreTable($dbAdapter);
+                    return $table;
+                },
+                'BackTyreTable' => function($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $table = new BackTyreTable($dbAdapter);
                     return $table;
                 },
 

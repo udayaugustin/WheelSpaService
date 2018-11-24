@@ -132,27 +132,27 @@ class AdminController extends AbstractActionController
         }
     }
 
-    public function addVehicleAction()
-    {
-        $session = new Container('credo');
-        if($session->roleCode == 'admin'){
-            $request = $this->getRequest();
-            $userService = $this->getServiceLocator()->get('UserService');
-            $vehicleService = $this->getServiceLocator()->get('VehicleService');
-            if ($request->isPost()) {
-                $params = $request->getPost();
-                $result = $vehicleService->addVehicle($params);
-                return $this->redirect()->toUrl("/admin/vehicle");
-            }else{
-                $userResult=$userService->getAllUsers();
-                return new ViewModel(array(
-                    'userResult' => $userResult,
-                ));
-            }
-        }else{
-            return $this->redirect()->toUrl("login");
-        }
-    }
+    // public function addVehicleAction()
+    // {
+    //     $session = new Container('credo');
+    //     if($session->roleCode == 'admin'){
+    //         $request = $this->getRequest();
+    //         $userService = $this->getServiceLocator()->get('UserService');
+    //         $vehicleService = $this->getServiceLocator()->get('VehicleService');
+    //         if ($request->isPost()) {
+    //             $params = $request->getPost();
+    //             $result = $vehicleService->addVehicle($params);
+    //             return $this->redirect()->toUrl("/admin/vehicle");
+    //         }else{
+    //             $userResult=$userService->getAllUsers();
+    //             return new ViewModel(array(
+    //                 'userResult' => $userResult,
+    //             ));
+    //         }
+    //     }else{
+    //         return $this->redirect()->toUrl("login");
+    //     }
+    // }
 
     public function editVehicleAction()
     {
