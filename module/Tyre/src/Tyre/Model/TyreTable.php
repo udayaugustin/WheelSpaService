@@ -379,13 +379,13 @@ class TyreTable extends AbstractTableGateway {
                 'tyre_brand' => $params['tyreBrand'][0],
                 'tyre_name' => $params['tyreName'][0],
                 'tyre_size' => $params['tyreSize'][0],
-                'rim_size' => $params-['rimSize'][0],
+                'rim_size' => $params['rimSize'][0],
                 'tyre_life_remaining' => $params['tyreLife'][0],
                 'date_of_parchase' => date('Y-m-d', strtotime($params['dateParchase'][0])),
                 'tyre_side' => $params['tyreSide'][0],
                 'tyre_type' => $params['tyreType']
             );
-            $updateResult = $this->update($data,array('tyre_id'=>$params->TyreId));
+            $updateResult = $this->update($data,array('tyre_id'=>$tyreId));
             if($params['tyreType'] == "different"){
                 $backTyreDb->delete("front_tyre_id=" . $tyreId);
                 $backData = array(
@@ -395,7 +395,7 @@ class TyreTable extends AbstractTableGateway {
                     'tyre_brand' => $params['tyreBrand'][1],
                     'tyre_name' => $params['tyreName'][1],
                     'tyre_size' => $params['tyreSize'][1],
-                    'rim_size' => $params-['rimSize'][1],
+                    'rim_size' => $params['rimSize'][1],
                     'tyre_life_remaining' => $params['tyreLife'][1],
                     'date_of_parchase' => date('Y-m-d', strtotime($params['dateParchase'][1])),
                     'tyre_side' => $params['tyreSide'][1],
