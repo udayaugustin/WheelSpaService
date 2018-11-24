@@ -122,18 +122,8 @@ $sessionLogin = new Container('credo');
                                 </div>
                             </div>
                             <div class="tab-pane" id="wizard-progress-step2" role="tabpanel">
-                                <table id="vehicleTable" class="table table-bordered table-condensed table">
-                                    <thead>
-                                        <tr>
-                                            <th>Vehicle Number</th>
-                                            <th>Vehicle Name</th>
-                                            <th>Vehicle Brand</th>
-                                            <th>Vehicle Model</th>
-                                            <th>Vehicle Type</th>
-                                            <th style="width: 110px !important;">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
+                                <table class="table table-bordered table-condensed table">
+                                    <tbody id="vehicleTable" >
                                         <tr>
                                             <td>
                                                 <div class="form-group row">
@@ -147,9 +137,7 @@ $sessionLogin = new Container('credo');
                                                         <input type="text" class="form-control" id="vehicleName1" name="vehicleName[]" placeholder="Enter name" title="Please enter name"">
                                                     </div>
                                                 </div>
-                                            </td>
 
-                                            <td>
                                                 <div class="form-group row">
                                                     <label class="col-sm-2 col-form-label" for="">Brand <span class="mandatory">*</span></label>
                                                     <div class="col-sm-4">
@@ -161,9 +149,7 @@ $sessionLogin = new Container('credo');
                                                         <input type="text" class="form-control" id="vehicleModel1" name="vehicleModel[]" placeholder="Enter model" title="Please enter model"">
                                                     </div>
                                                 </div>
-                                            </td>
 
-                                            <td>
                                                 <div class="form-group row">
                                                     <label class="col-sm-2 col-form-label" for="">Type <span class="mandatory">*</span></label>
                                                     <div class="col-sm-4">
@@ -175,25 +161,19 @@ $sessionLogin = new Container('credo');
                                                         <input type="text" class="form-control" id="vehicleVersion1" name="vehicleVersion[]" placeholder="Enter version" title="Please enter version"">
                                                     </div>
                                                 </div>
-                                            </td>
-                                           
-                                            <td>
+
                                                 <div class="form-group row">
                                                     <label class="col-sm-2 col-form-label" for="">Year of Purchase <span class="mandatory">*</span></label>
                                                     <div class="col-sm-4">
-                                                        <input type="text" class="form-control" id="yearPurchase1" name="yearPurchase[]" placeholder="Enter purchase" title="Please enter purchase"">
+                                                        <input type="text" class="form-control" id="yearPurchase1" name="yearPurchase[]" placeholder="Enter purchase" title="Please enter purchase">
                                                     </div>
                                                     
-                                                    <label class="col-sm-2 col-form-label" for="">K.M Car Done So Far
-                                                        
-                                                    </label>
+                                                    <label class="col-sm-2 col-form-label" for="">K.M Car Done So Far</label>
                                                     <div class="col-sm-4">
                                                         <input type="text" class="form-control" id="kmDone1" name="kmDone[]" placeholder="Enter K.M car done so far" title="Please enter K.M car done so far"">
                                                     </div>
                                                 </div>
-                                            </td>
-                                            
-                                            <td>
+
                                                 <div class="form-group row">
                                                     <label class="col-sm-2 col-form-label" for="">Average Drive Per Week</label>
                                                     <div class="col-sm-4">
@@ -203,7 +183,7 @@ $sessionLogin = new Container('credo');
                                             </td>
 
                                             <td style="text-align: center">
-                                                <a href="javascript:void(0);" class="btn btn-info btn-xs" onclick= "insRow()";><i class="fa fa-plus"> </i></a>&nbsp;<a class="btn btn-round btn-danger btn-xs" onclick= "removeRow(this.parentNode.parentNode);"><i class="fa fa-minus"> </i></a>
+                                                <a href="javascript:void(0);" class="btn btn-info btn-xs" onclick= "insRow()";><i class="fa fa-plus"> </i></a><br><br><a class="btn btn-round btn-danger btn-xs" onclick= "removeRow(this.parentNode.parentNode);"><i class="fa fa-minus"> </i></a>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -212,8 +192,8 @@ $sessionLogin = new Container('credo');
                         </div>
                     </div>               
                     <button type="button" class="btn btn-secondary btnHide" onclick="validateStep2()" style="display:none;"><i class="fa fa-angle-left mr-1"></i> Previous</button>
-                    <button type="button" class="btn btn-secondary nxtBtn" onclick="validateStep1()" style=" float: right; ">Next <i class="fa fa-angle-right ml-1"></i></button>
-                    <div class="row items-push" style="display:none;">
+                    <button type="button" class="btn btn-secondary nxtBtn" onclick="validateStep1()" style=" float: right;margin-bottom: 15px; ">Next <i class="fa fa-angle-right ml-1"></i></button>
+                    <div class="row items-push submit" style="display:none;">
                         <div class="col-lg-7 offset-lg-4">
                             <a href="<?php echo $this->url('admin', array('action' => 'user')); ?>" class="btn btn-danger">Cancel</a>&nbsp;
                             <button type="submit" class="btn btn-primary" onclick="validateNow();return false;"><i class="fa fa-fw fa-check"></i> Submit</button>
@@ -281,19 +261,11 @@ $sessionLogin = new Container('credo');
           a.setAttribute("class", "data");
           var b = a.insertCell(0);
           var c = a.insertCell(1);
-          var d = a.insertCell(2);
-          var e = a.insertCell(3);
-          var f = a.insertCell(4);
-          var g = a.insertCell(5);
-
+          
           c.setAttribute("align", "center");
 
-          b.innerHTML = '<input type="text" class="form-control isRequired" id="vehicleNumber' + rowCount + '" name="vehicleNumber[]" placeholder="Enter number" title="Please enter number" onblur="checkNameValidation("vehicle_details", "vehicle_no", this,null, "The vehicle number that you entered already exists . Please try another number.."); checkVehicle(' + rowCount + ',this);">';
-          c.innerHTML = '<input type="text" class="form-control isRequired" id="vehicleName' + rowCount + '" name="vehicleName[]" placeholder="Enter name" title="Please enter name"">';
-          d.innerHTML = '<input type="text" class="form-control isRequired" id="vehicleBrand' + rowCount + '" name="vehicleBrand[]" placeholder="Enter brand" title="Please enter brand"">';
-          e.innerHTML = '<input type="text" class="form-control isRequired" id="vehicleModel' + rowCount + '" name="vehicleModel[]" placeholder="Enter model" title="Please enter model"">';
-          f.innerHTML = '<input type="text" class="form-control isRequired" id="vehicleType' + rowCount + '" name="vehicleType[]" placeholder="Enter type" title="Please enter type"">';
-          g.innerHTML = '<a href="javascript:void(0);" class="btn btn-info btn-xs" id="addBlock" onclick= "insRow()";><i class="fa fa-plus"> </i></a>&nbsp;<a class="btn btn-round btn-danger btn-xs" onclick= "removeRow(this.parentNode.parentNode);"><i class="fa fa-minus"> </a>';
+          b.innerHTML = '<div class="form-group row"><label class="col-sm-2 col-form-label" for="">Number <span class="mandatory">*</span></label><div class="col-sm-4"><input type="text" class="form-control" id="vehicleNumber' + rowCount + '" name="vehicleNumber[]" placeholder="Enter number" title="Please enter number" onblur="checkNameValidation("vehicle_details", "vehicle_no", this,null, "The vehicle number that you entered already exists . Please try another number.."); checkVehicle("1",this);"></div><label class="col-sm-2 col-form-label" for="">Name <span class="mandatory">*</span></label><div class="col-sm-4"><input type="text" class="form-control" id="vehicleName' + rowCount + '" name="vehicleName[]" placeholder="Enter name" title="Please enter name""></div></div><div class="form-group row"><label class="col-sm-2 col-form-label" for="">Brand <span class="mandatory">*</span></label><div class="col-sm-4"><input type="text" class="form-control" id="vehicleBrand' + rowCount + '" name="vehicleBrand[]" placeholder="Enter brand" title="Please enter brand""></div><label class="col-sm-2 col-form-label" for="">Model <span class="mandatory">*</span></label><div class="col-sm-4"><input type="text" class="form-control" id="vehicleModel' + rowCount + '" name="vehicleModel[]" placeholder="Enter model" title="Please enter model""></div></div><div class="form-group row"><label class="col-sm-2 col-form-label" for="">Type <span class="mandatory">*</span></label><div class="col-sm-4"><input type="text" class="form-control" id="vehicleType' + rowCount + '" name="vehicleType[]" placeholder="Enter type" title="Please enter type""></div><label class="col-sm-2 col-form-label" for="">Version <span class="mandatory">*</span></label><div class="col-sm-4"><input type="text" class="form-control" id="vehicleVersion' + rowCount + '" name="vehicleVersion[]" placeholder="Enter version" title="Please enter version""></div></div><div class="form-group row"><label class="col-sm-2 col-form-label" for="">Year of Purchase <span class="mandatory">*</span></label><div class="col-sm-4"><input type="text" class="form-control" id="yearPurchase' + rowCount + '" name="yearPurchase[]" placeholder="Enter purchase" title="Please enter purchase"></div><label class="col-sm-2 col-form-label" for="">K.M Car Done So Far</label><div class="col-sm-4"><input type="text" class="form-control" id="kmDone' + rowCount + '" name="kmDone[]" placeholder="Enter K.M car done so far" title="Please enter K.M car done so far""></div></div><div class="form-group row"><label class="col-sm-2 col-form-label" for="">Average Drive Per Week</label><div class="col-sm-4"><input type="text" class="form-control" id="avgDrive' + rowCount + '" name="avgDrive[]" placeholder="Enter average drive per week" title="Please enter average drive per week""></div></div>';
+          c.innerHTML = '<a href="javascript:void(0);" class="btn btn-info btn-xs" id="addBlock" onclick= "insRow()";><i class="fa fa-plus"> </i></a><br><br><a class="btn btn-round btn-danger btn-xs" onclick= "removeRow(this.parentNode.parentNode);"><i class="fa fa-minus"> </a>';
 
           $(a).fadeIn(800);
      }
@@ -302,7 +274,7 @@ $sessionLogin = new Container('credo');
           $(el).fadeOut("slow", function() {
                el.parentNode.removeChild(el);
                rl = document.getElementById("vehicleTable").rows.length;
-               if (rl == 1) {
+               if (rl == 0) {
                     insRow();
                }
           });

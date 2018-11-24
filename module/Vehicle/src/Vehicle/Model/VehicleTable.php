@@ -52,15 +52,15 @@ class VehicleTable extends AbstractTableGateway {
                 $this->insert($data);
                 $lastInsertedId = $this->lastInsertValue;
                 if($lastInsertedId > 0){
-                    $response['status'] = 'success';
-                    $response['message'] ='succesffuly added';
+                    $response['Status'] = 'success';
+                    $response['Message'] ='succesffuly added';
                 }else{
-                    $response['status'] = 'failed';
-                    $response['message'] ='Not added try again';
+                    $response['Status'] = 'failed';
+                    $response['Message'] ='Not added try again';
                 }
             }else{
-                $response['status'] = 'failed';
-                $response['message'] ='vehicle no already exists';
+                $response['Status'] = 'failed';
+                $response['Message'] ='vehicle no already exists';
             }
         }
         return $response;
@@ -81,7 +81,7 @@ class VehicleTable extends AbstractTableGateway {
                 $vehicleResult=$dbAdapter->query($vehicleQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 
                 $response['status'] = 'success';
-                $response['vehicle-details'] = $vehicleResult;
+                $response['VehicleDetails'] = $vehicleResult;
             }else if(isset($rResult->role_code) && $rResult->role_code =='user'){
                 $vehicleQuery = $sql->select()->from(array('vd' => 'vehicle_details'))->columns(array('*'))
                                     ->join(array('ud'=>'user_details'),'ud.user_id=vd.user_id',array('name'))
@@ -89,19 +89,19 @@ class VehicleTable extends AbstractTableGateway {
                 $vehicleQueryStr = $sql->getSqlStringForSqlObject($vehicleQuery);
                 $vehicleResult=$dbAdapter->query($vehicleQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 if(isset($vehicleResult) && trim($vehicleResult)     != ""){
-                    $response['status'] = 'success';
-                    $response['vehicle-details'] = $vehicleResult;
+                    $response['Status'] = 'success';
+                    $response['VehicleDetails'] = $vehicleResult;
                 }else{
-                    $response['status']='fail';
-                    $response['message']="No vehicle found for this user";    
+                    $response['Status']='fail';
+                    $response['Message']="No vehicle found for this user";    
                 }
             }else{
-                $response['status']='fail';
-                $response['message']="User not found";    
+                $response['Status']='fail';
+                $response['Message']="User not found";    
             }
         }else {
-            $response['status']='fail';
-            $response['message']="No data found";
+            $response['Status']='fail';
+            $response['Message']="No data found";
         }
         return $response;
     }
@@ -142,19 +142,19 @@ class VehicleTable extends AbstractTableGateway {
                 $updateResult = $this->update($data,array('vehicle_id'=>$params->VehicleId));
 
                 if($updateResult > 0){
-                    $response['status'] = 'success';
-                    $response['vehicle-details'] = 'Data updated successfully';
+                    $response['Status'] = 'success';
+                    $response['VehicleDetails'] = 'Data updated successfully';
                 }else{
-                    $response['status'] = 'failed';
-                    $response['Vehicle-details'] = 'No updates found';
+                    $response['Status'] = 'failed';
+                    $response['VehicleDetails'] = 'No updates found';
                 }
             }else{
-                $response['status'] = 'failed';
-                $response['Vehicle-details'] = 'Vehicle not found';
+                $response['Status'] = 'failed';
+                $response['VehicleDetails'] = 'Vehicle not found';
             }
         }else{
-            $response['status'] = 'failed';
-            $response['Vehicle-details'] = 'You are not have privillage to update';
+            $response['Status'] = 'failed';
+            $response['VehicleDetails'] = 'You are not have privillage to update';
         }
         return $response;
     }

@@ -29,8 +29,8 @@ $sessionLogin = new Container('credo');
                         <label class="col-sm-2 col-form-label" for="">Tyre Type<span class="mandatory">*</span></label>
                         <div class="col-sm-4">
                             <select class="form-control isRequired" id="tyreType" name="tyreType" title="Please select the tyre type" onchange="checkDiff(this);">
-                                <option value="same">Same</option>
-                                <option value="different">Different</option>
+                                <option value="same" <?php echo($result['vehicle_id'] == $vehicle['vehicle_id'] )?'selected="selected"':''; ?>>Same</option>
+                                <option value="different" <?php echo($result['vehicle_id'] == $vehicle['vehicle_id'] )?'selected="selected"':''; ?>>Different</option>
                             </select>
                         </div>
                     </div>
