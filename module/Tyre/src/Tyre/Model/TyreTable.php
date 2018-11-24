@@ -336,10 +336,8 @@ class TyreTable extends AbstractTableGateway {
             $lastInsertedId = $this->lastInsertValue;
             if($lastInsertedId > 0){
                 if($params['tyreType'] == "different"){
-                    $userId2 = $vehicleDb->select(array('vehicle_id'=>base64_decode($params['vehicleId'][1])))->current();
                     $backData = array(
                         'front_tyre_id' => $lastInsertedId,
-                        'user_id' => $userId2['user_id'],
                         'vehicle_id' => base64_decode($params['vehicleId'][1]),
                         'tyre' => $params['tyre'][1],
                         'tyre_brand' => $params['tyreBrand'][1],
@@ -390,10 +388,8 @@ class TyreTable extends AbstractTableGateway {
             $updateResult = $this->update($data,array('tyre_id'=>$params->TyreId));
             if($params['tyreType'] == "different"){
                 $backTyreDb->delete("front_tyre_id=" . $tyreId);
-                $userId2 = $vehicleDb->select(array('vehicle_id'=>base64_decode($params['vehicleId'][1])))->current();
                 $backData = array(
                     'front_tyre_id' => $tyreId,
-                    'user_id' => $userId2['user_id'],
                     'vehicle_id' => base64_decode($params['vehicleId'][1]),
                     'tyre' => $params['tyre'][1],
                     'tyre_brand' => $params['tyreBrand'][1],
