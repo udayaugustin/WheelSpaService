@@ -33,10 +33,14 @@ class VehicleTable extends AbstractTableGateway {
                     'vehicle_no' => $params->VehicleNo,
                     'user_id' => $params->UserId,
                     'vehicle_name' => $params->VehicleName,
-                    'vehicle_brand' => $params->VehicleBrand,
-                    'vehicle_model' => $params->VehicleModel,
-                    'vehicle_type' => $params->VehicleType
+                    'vehicle_brand' => $params->VehicleBrand
                 );
+                if(isset($params->VehicleModel) && trim($params->VehicleModel) != ""){
+                    $data['vehicle_model'] = $params->VehicleModel;
+                }
+                if(isset($params->VehicleType) && trim($params->VehicleType) != ""){
+                    $data['vehicle_type'] = $params->VehicleType;
+                }
                 if(isset($params->VehicleVersion) && trim($params->VehicleVersion) != ""){
                     $data['vehicle_version'] = $params->VehicleVersion;
                 }
@@ -123,10 +127,14 @@ class VehicleTable extends AbstractTableGateway {
                     'vehicle_no' => $params->VehicleNo,
                     'user_id' => $params->UserId,
                     'vehicle_name' => $params->VehicleName,
-                    'vehicle_brand' => $params->VehicleBrand,
-                    'vehicle_model' => $params->VehicleModel,
-                    'vehicle_type' => $params->VehicleType
+                    'vehicle_brand' => $params->VehicleBrand
                 );
+                if(isset($params->VehicleModel) && trim($params->VehicleModel) != ""){
+                    $data['vehicle_model'] = $params->VehicleModel;
+                }
+                if(isset($params->VehicleType) && trim($params->VehicleType) != ""){
+                    $data['vehicle_type'] = $params->VehicleType;
+                }
                 if(isset($params->VehicleVersion) && trim($params->VehicleVersion) != ""){
                     $data['vehicle_version'] = $params->VehicleVersion;
                 }
@@ -285,15 +293,26 @@ class VehicleTable extends AbstractTableGateway {
                 'vehicle_no' => $params['vehicleNo'],
                 'user_id' => base64_decode($params['ownerName']),
                 'vehicle_name' => $params['vehicleName'],
-                'vehicle_brand' => $params['brand'],
-                'vehicle_model' => $params['model'],
-                'vehicle_type' => $params['type'],
-                'vehicle_version' => $params['vehicleVersion'],
-                'year_of_purchase' => $params['yearPurchase'],
-                'km_done' => $params['kmDone'],
-                'avg_drive_per_week' => $params['avgDrive']
-                
+                'vehicle_brand' => $params['brand']
             );
+            if(isset($params['model']) && trim($params['model']) != ""){
+                $data['vehicle_model'] = $params['model'];
+            }
+            if(isset($params['type']) && trim($params['type']) != ""){
+                $data['vehicle_type'] = $params['type'];
+            }
+            if(isset($params['vehicleVersion']) && trim($params['vehicleVersion']) != ""){
+                $data['vehicle_version'] = $params['vehicleVersion'];
+            }
+            if(isset($params['yearPurchase']) && trim($params['yearPurchase']) != ""){
+                $data['year_of_purchase'] = $params['yearPurchase'];
+            }
+            if(isset($params['kmDone']) && trim($params['kmDone']) != ""){
+                $data['km_done'] = $params['kmDone'];
+            }
+            if(isset($params['avgDrive']) && trim($params['avgDrive']) != ""){
+                $data['avg_drive_per_week'] = $params['avgDrive'];
+            }
             $this->insert($data);
             $lastInsertedId = $this->lastInsertValue;
         }
@@ -320,15 +339,26 @@ class VehicleTable extends AbstractTableGateway {
                 'vehicle_no' => $params['vehicleNo'],
                 'user_id' => base64_decode($params['ownerName']),
                 'vehicle_name' => $params['vehicleName'],
-                'vehicle_brand' => $params['brand'],
-                'vehicle_model' => $params['model'],
-                'vehicle_type' => $params['type'],
-                'vehicle_version' => $params['vehicleVersion'],
-                'year_of_purchase' => $params['yearPurchase'],
-                'km_done' => $params['kmDone'],
-                'avg_drive_per_week' => $params['avgDrive']
-                
+                'vehicle_brand' => $params['brand']
             );
+            if(isset($params['model']) && trim($params['model']) != ""){
+                $data['vehicle_model'] = $params['model'];
+            }
+            if(isset($params['type']) && trim($params['type']) != ""){
+                $data['vehicle_type'] = $params['type'];
+            }
+            if(isset($params['vehicleVersion']) && trim($params['vehicleVersion']) != ""){
+                $data['vehicle_version'] = $params['vehicleVersion'];
+            }
+            if(isset($params['yearPurchase']) && trim($params['yearPurchase']) != ""){
+                $data['year_of_purchase'] = $params['yearPurchase'];
+            }
+            if(isset($params['kmDone']) && trim($params['kmDone']) != ""){
+                $data['km_done'] = $params['kmDone'];
+            }
+            if(isset($params['avgDrive']) && trim($params['avgDrive']) != ""){
+                $data['avg_drive_per_week'] = $params['avgDrive'];
+            }
             $updateResult = $this->update($data,array('vehicle_id'=>base64_decode($params['vehicleId'])));
             if($updateResult > 0){
                 $lastInsertedId = 1;

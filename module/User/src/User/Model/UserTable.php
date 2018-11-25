@@ -74,7 +74,6 @@ class UserTable extends AbstractTableGateway {
             $rResult=$dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
             $authToken = $common->generateRandomString();
             
-            // \Zend\Debug\Debug::dump($rResult->user_id);die;
             if(!isset($rResult->user_id) && trim($rResult->user_id) == ""){
                 $config = new \Zend\Config\Reader\Ini();
                 $configResult = $config->fromFile(CONFIG_PATH . '/custom.config.ini');
@@ -112,10 +111,25 @@ class UserTable extends AbstractTableGateway {
                 }
                 $this->insert($data);
                 $lastInsertedId = $this->lastInsertValue;
+                $result = $this->select(array('user_id'=>$lastInsertedId))->current();
                 if($lastInsertedId > 0){
                     $response['Status'] = 'success';
-                    $response['AuthToken'] = $authToken;
-                    $response['Sessage'] ='succesffuly registered';
+                    if($params->LoginType == 'facebook'){
+                        if($result->role_id == 1){
+                            $roleCode = 'Admin';
+                        }else{
+                            $roleCode = 'User';
+                        }
+                        $response['UserDetails']=array(
+                            'UserId' => $result->user_id,
+                            'UserName' => $result->username,
+                            'RoleCode' => $roleCode,                                        
+                            'AuthToken' => $authToken,                                        
+                        );
+                    }else{
+                        $response['AuthToken']= $authToken;
+                    }
+                    $response['Message'] ='succesffuly registered';
                 }else{
                     $response['Status'] = 'failed';
                     $response['Message'] ='Not registered try again';
