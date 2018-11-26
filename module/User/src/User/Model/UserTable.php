@@ -73,7 +73,6 @@ class UserTable extends AbstractTableGateway {
             $queryStr = $sql->getSqlStringForSqlObject($query);
             $rResult=$dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
             $authToken = $common->generateRandomString();
-            
             if(!isset($rResult->user_id) && trim($rResult->user_id) == ""){
                 $config = new \Zend\Config\Reader\Ini();
                 $configResult = $config->fromFile(CONFIG_PATH . '/custom.config.ini');
