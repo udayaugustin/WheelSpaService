@@ -97,35 +97,54 @@ class TyreTable extends AbstractTableGateway {
             $rResult=$dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
             if(isset($rResult->role_code) && $rResult->role_code =='admin'){
                 $tyreQuery = $sql->select()->from(array('td' => 'front_tyre_details'))->columns(array('*'))
-                                ->join(array('ud'=>'user_details'),'ud.user_id=td.user_id',array('name'));
+                ->join(array('ud'=>'user_details'),'ud.user_id=td.user_id',array('name'));
                 $tyreQueryStr = $sql->getSqlStringForSqlObject($tyreQuery);
                 $tyreResult=$dbAdapter->query($tyreQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-                
-                $response['Status'] = 'success';
-                $response['TyreDetails'] = $tyreResult;
-                foreach($tyreResult as $tyre){
-                    $backTyreQuery = $sql->select()->from(array('td' => 'back_tyre_details'))->columns(array('*'))
-                                ->join(array('ud'=>'user_details'),'ud.user_id=td.user_id',array('name'))
-                                ->where(array('td.front_tyre_id' => $tyre['tyre_id']));
-                    $backTyreQueryStr = $sql->getSqlStringForSqlObject($backTyreQuery);
-                    $backTyreResult=$dbAdapter->query($backTyreQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                    $response['TyreDetails']['BackTyre'] = $backTyreResult;
+                // \Zend\Debug\Debug::dump($tyreResult);die;
+                $arrResult = array();
+                if(count($tyreResult) > 0){
+                    $response['Status'] = 'success';
+                    foreach($tyreResult as $tyre){
+                        if($tyreResult['tyre_type'] == 'same'){
+                            $arrResult = $tyre;
+                        }else{
+                            $arrResult['TyreType'][] = $tyre['tyre_type'];
+                            $arrResult['FrontTyre'][] = $tyre;
+                            if($tyre['tyre_type'] != 'same'){
+                                $backTyreQuery = $sql->select()->from(array('td' => 'back_tyre_details'))->columns(array('*'))
+                                            ->join(array('ud'=>'user_details'),'ud.user_id=td.user_id',array('name'))
+                                            ->where(array('td.front_tyre_id' => $tyre['tyre_id']));
+                                $backTyreQueryStr = $sql->getSqlStringForSqlObject($backTyreQuery);
+                                $backTyreResult=$dbAdapter->query($backTyreQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                                $arrResult['RearTyre'][] = $backTyreResult;
+                            }
+                        }
+                    }
+                    $response['TyreDetails'] = $arrResult;
+                }else{
+                    $response['Status']='fail';
+                    $response['Message']="No tyre found for this user";    
                 }
             }else if(isset($rResult->role_code) && $rResult->role_code =='user'){
-                $tyreQuery = $sql->select()->from(array('td' => 'tyre_details'))->columns(array('*'))
+                $tyreQuery = $sql->select()->from(array('td' => 'front_tyre_details'))->columns(array('*'))
                                     ->join(array('ud'=>'user_details'),'ud.user_id=td.user_id',array('name'))
                                     ->where(array('ud.auth_token' => $params->AuthToken));
                 $tyreQueryStr = $sql->getSqlStringForSqlObject($tyreQuery);
                 $tyreResult=$dbAdapter->query($tyreQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                if(isset($tyreResult) && trim($tyreResult) != ""){
+                if($tyreResult != ""){
                     $response['Status'] = 'success';
-                    $response['TyreDetails'] = $tyreResult;
-                    $backTyreQuery = $sql->select()->from(array('td' => 'back_tyre_details'))->columns(array('*'))
-                                ->join(array('ud'=>'user_details'),'ud.user_id=td.user_id',array('name'))
-                                ->where(array('td.front_tyre_id' => $tyreResult['tyre_id']));
-                    $backTyreQueryStr = $sql->getSqlStringForSqlObject($backTyreQuery);
-                    $backTyreResult=$dbAdapter->query($backTyreQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                    $response['TyreDetails']['BackTyre'] = $backTyreResult;
+                    if($tyreDetails['tyre_type'] == 'same'){
+                        $response['TyreDetails'] = $tyreResult;
+                    }else{
+                        $response['TyreType'] = $tyreResult['tyre_type'];
+                        $response['FrontTyre'] = $tyreResult;
+                        $backTyreQuery = $sql->select()->from(array('td' => 'back_tyre_details'))->columns(array('*'))
+                                    ->join(array('ud'=>'user_details'),'ud.user_id=td.user_id',array('name'))
+                                    ->where(array('td.front_tyre_id' => $tyreResult['tyre_id']));
+                        $backTyreQueryStr = $sql->getSqlStringForSqlObject($backTyreQuery);
+                        $backTyreResult=$dbAdapter->query($backTyreQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                        $response['RearTyre'] = $backTyreResult;
+                    }
                 }else{
                     $response['Status']='fail';
                     $response['Message']="No tyre found for this user";    
@@ -349,9 +368,11 @@ class TyreTable extends AbstractTableGateway {
             $this->insert($data);
             $lastInsertedId = $this->lastInsertValue;
             if($lastInsertedId > 0){
+                $userId2 = $vehicleDb->select(array('vehicle_id'=>base64_decode($params['vehicleId'][1])))->current();
                 if($params['tyreType'] == "different"){
                     $backData = array(
                         'front_tyre_id' => $lastInsertedId,
+                        'user_id' => $userId2['user_id'],
                         'vehicle_id' => base64_decode($params['vehicleId'][1]),
                         'tyre' => $params['tyre'][1],
                         'tyre_brand' => $params['tyreBrand'][1],
@@ -401,9 +422,11 @@ class TyreTable extends AbstractTableGateway {
             );
             $updateResult = $this->update($data,array('tyre_id'=>$tyreId));
             if($params['tyreType'] == "different"){
+                $userId2 = $vehicleDb->select(array('vehicle_id'=>base64_decode($params['vehicleId'][1])))->current();
                 $backTyreDb->delete("front_tyre_id=" . $tyreId);
                 $backData = array(
                     'front_tyre_id' => $tyreId,
+                    'user_id' => $userId2['user_id'],
                     'vehicle_id' => base64_decode($params['vehicleId'][1]),
                     'tyre' => $params['tyre'][1],
                     'tyre_brand' => $params['tyreBrand'][1],
