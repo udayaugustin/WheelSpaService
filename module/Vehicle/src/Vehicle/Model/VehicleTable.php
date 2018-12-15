@@ -92,7 +92,7 @@ class VehicleTable extends AbstractTableGateway {
                                     ->where(array('ud.auth_token' => $params->AuthToken));
                 $vehicleQueryStr = $sql->getSqlStringForSqlObject($vehicleQuery);
                 $vehicleResult=$dbAdapter->query($vehicleQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-                if(isset($vehicleResult) && trim($vehicleResult)     != ""){
+                if(count($vehicleResult) > 0){
                     $response['Status'] = 'success';
                     $response['VehicleDetails'] = $vehicleResult;
                 }else{
