@@ -15,7 +15,7 @@ return array(
                         'options' => array(
                               'route'    => '/',
                               'defaults' => array(
-                                    'controller' => 'Application\Controller\Index',
+                                    'controller' => 'Application\Controller\Admin',
                                     'action'     => 'index',
                               ),
                         ),
@@ -50,7 +50,7 @@ return array(
                         'defaults' => array(
                               'controller' => 'Application\Controller\Login',
                               'action'     => 'logout',
-                        ),
+                              ),
                         ),
                   ),
 
@@ -61,7 +61,17 @@ return array(
                         'defaults' => array(
                               'controller' => 'Application\Controller\Common',
                               'action' => 'index',
+                              ),
                         ),
+                  ),
+                  'activate' => array(
+                        'type' => 'segment',
+                        'options' => array(
+                        'route' => '/activate[/:action][/][:id]',
+                        'defaults' => array(
+                              'controller' => 'Application\Controller\Activate',
+                              'action' => 'index',
+                              ),
                         ),
                   ),
                   // The following is a route to simplify getting started creating
@@ -124,6 +134,7 @@ return array(
                'Application\Controller\Login' => 'Application\Controller\LoginController',
                'Application\Controller\Admin' => 'Application\Controller\AdminController',
                'Application\Controller\Common' => 'Application\Controller\CommonController',
+               'Application\Controller\Activate' => 'Application\Controller\ActivateController',
           ),
      ),
      'controller_plugins' => array(

@@ -73,7 +73,7 @@ class UserTable extends AbstractTableGateway {
             $queryStr = $sql->getSqlStringForSqlObject($query);
             $rResult=$dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
             $authToken = $common->generateRandomString();
-            if(!isset($rResult->user_id) && trim($rResult->user_id) == ""){
+            if(!isset($rResult['user_id']) && trim($rResult['user_id']) == ""){
                 $config = new \Zend\Config\Reader\Ini();
                 $configResult = $config->fromFile(CONFIG_PATH . '/custom.config.ini');
                 $password = sha1($params->Password . $configResult["password"]["salt"]);
@@ -370,16 +370,14 @@ class UserTable extends AbstractTableGateway {
                 "aaData" => array()
         );
         foreach ($rResult as $aRow) {
-            if($aRow['role_id'] == '2'){
-                $row = array();
-                $row[] = ucwords($aRow['name']);
-                $row[] = ucwords($aRow['role_name']);
-                $row[] = $aRow['username'];
-                $row[] = $aRow['phone'];
-                $row[] = ucwords($aRow['user_status']);
-                $row[] = '<a href="/admin/edit-user/' . base64_encode($aRow['user_id']) . '" class="btn btn-default" style="margin-right: 2px;" title="Edit"><i class="far fa-edit"></i>Edit</a>';
-                $output['aaData'][] = $row;
-            }
+            $row = array();
+            $row[] = ucwords($aRow['name']);
+            $row[] = ucwords($aRow['role_name']);
+            $row[] = $aRow['username'];
+            $row[] = $aRow['phone'];
+            $row[] = ucwords($aRow['user_status']);
+            $row[] = '<a href="/admin/edit-user/' . base64_encode($aRow['user_id']) . '" class="btn btn-default" style="margin-right: 2px;" title="Edit"><i class="far fa-edit"></i>Edit</a>';
+            $output['aaData'][] = $row;
         }
 
         return $output;
@@ -454,42 +452,108 @@ class UserTable extends AbstractTableGateway {
 
     public function fetchUserDetailsById($userId)
     {
+        $vehicleDb = new \Vehicle\Model\VehicleTable($this->adapter);
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $query = $sql->select()->from(array('ud' => 'user_details'))
                         ->where(array('ud.user_id' => $userId));
         $queryStr = $sql->getSqlStringForSqlObject($query);
         $rResult=$dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-        return $rResult;
+        $vehicleResult = $vehicleDb->fetchVehicleDetailsByUserId($userId);
+        return array('userResult'=>$rResult,'vehicleResult'=>$vehicleResult);
     }
 
     public function updateUserDetailsById($params)
     {
+        // \Zend\Debug\Debug::dump($params);die;
+        $common = new CommonService;
+        $vehicleDb = new \Vehicle\Model\VehicleTable($this->adapter);
         $config = new \Zend\Config\Reader\Ini();
         $configResult = $config->fromFile(CONFIG_PATH . '/custom.config.ini');
         $common = new CommonService;
+        $lastInsertedId = 0;
         if(isset($params['userId']) && trim($params['userId'])!="")
         {
-            $lastInsertedId = 0;
             $data = array(
                 'name' => $params['name'],
                 'role_id' => base64_decode($params['roleName']),
                 'username' => $params['email'],
                 'phone' => $params['mobile'],
-                'user_dob' => $common->dbDateFormat($params['dob']),
-                'pincode' => $params['pincode'],
-                'state' => $params['state'],
-                'city' => $params['city'],
-                'street_address' => $params['address'],
                 'user_status' => $params['userStatus']
             );
             if($params['password']!=''){
                 $password = sha1($params['password'] . $configResult["password"]["salt"]);
                 $data['password'] = $password;
             }
-            // \Zend\Debug\Debug::dump($data);die;
+            if(isset($params['dob']) && trim($params['dob']) != ""){
+                $data['user_dob'] = $common->dbDateFormat($params['dob']);
+            }
+            if(isset($params['pincode']) && trim($params['pincode']) != ""){
+                $data['pincode'] = $params['pincode'];
+            }
+            if(isset($params['state']) && trim($params['state']) != ""){
+                $data['state'] = $params['state'];
+            }
+            if(isset($params['city']) && trim($params['city']) != ""){
+                $data['city'] = $params['city'];
+            }
+            if(isset($params['address']) && trim($params['address']) != ""){
+                $data['street_address'] = $params['address'];
+            }
             $updateResult = $this->update($data,array('user_id'=>base64_decode($params['userId'])));
-            if($updateResult > 0){
+            $deleteId = explode(',',$params['deleteId']);
+            foreach($deleteId as $delete){
+                $deleteResult = $vehicleDb->delete(array('vehicle_id'=>base64_decode($delete)));
+            }
+            $n = count($params['vehicleNumber']);
+            for($i = 0; $i < $n; $i++){
+                if(isset($params['vehicleId'][$i]) && trim($params['vehicleId'][$i]) != ''){
+                    $vehicleUpdateData = array(
+                        'user_id' => base64_decode($params['userId']),
+                        'vehicle_no' => $params['vehicleNumber'][$i],
+                        'vehicle_name' => $params['vehicleName'][$i],
+                        'vehicle_brand' => $params['vehicleBrand'][$i],
+                        'vehicle_model' => $params['vehicleModel'][$i],
+                        'vehicle_type' => $params['vehicleType'][$i],
+                    );
+                    if(isset($params['yearPurchase'][$i]) && trim($params['yearPurchase'][$i]) != ""){
+                        $vehicleUpdateData['year_of_purchase'] = $params['yearPurchase'][$i];
+                    }
+                    if(isset($params['kmDone'][$i]) && trim($params['kmDone'][$i]) != ""){
+                        $vehicleUpdateData['km_done'] = $params['kmDone'][$i];
+                    }
+                    if(isset($params['avgDrive'][$i]) && trim($params['avgDrive'][$i]) != ""){
+                        $vehicleUpdateData['avg_drive_per_week'] = $params['avgDrive'][$i];
+                    }
+                    if(isset($params['vehicleVersion'][$i]) && trim($params['vehicleVersion'][$i]) != ""){
+                        $vehicleUpdateData['vehicle_version'] = $params['vehicleVersion'][$i];
+                    }
+                    $updateVehicleResult = $vehicleDb->update($vehicleUpdateData,array('vehicle_id'=>base64_decode($params['vehicleId'][$i])));
+                }else{
+                    $vehicleInsertData = array(
+                        'user_id' => base64_decode($params['userId']),
+                        'vehicle_no' => $params['vehicleNumber'][$i],
+                        'vehicle_name' => $params['vehicleName'][$i],
+                        'vehicle_brand' => $params['vehicleBrand'][$i],
+                        'vehicle_model' => $params['vehicleModel'][$i],
+                        'vehicle_type' => $params['vehicleType'][$i],
+                    );
+                    if(isset($params['yearPurchase'][$i]) && trim($params['yearPurchase'][$i]) != ""){
+                        $vehicleInsertData['year_of_purchase'] = $params['yearPurchase'][$i];
+                    }
+                    if(isset($params['kmDone'][$i]) && trim($params['kmDone'][$i]) != ""){
+                        $vehicleInsertData['km_done'] = $params['kmDone'][$i];
+                    }
+                    if(isset($params['avgDrive'][$i]) && trim($params['avgDrive'][$i]) != ""){
+                        $vehicleInsertData['avg_drive_per_week'] = $params['avgDrive'][$i];
+                    }
+                    if(isset($params['vehicleVersion'][$i]) && trim($params['vehicleVersion'][$i]) != ""){
+                        $vehicleInsertData['vehicle_version'] = $params['vehicleVersion'][$i];
+                    }
+                    $vehicleDb->insert($vehicleInsertData);
+                }
+            }
+            if($updateResult > 0 || $updateVehicleResult > 0 || $deleteResult > 0){
                 $lastInsertedId = 1;
             }
         }
@@ -498,5 +562,10 @@ class UserTable extends AbstractTableGateway {
 
     public function fetchAllUsers(){
         return $this->select()->toArray();
+    }
+    
+    public function updateUserStatus($userToken){
+        $data = array('user_status'=>'active');
+        return $this->update($data,array('auth_token'=>$userToken));
     }
 }

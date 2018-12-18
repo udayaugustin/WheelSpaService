@@ -45,6 +45,11 @@ class Module{
             if(substr($tempName[0], 0, -1) == 'Application'){
                 $session = new Container('credo');
                 if (!isset($session->userId) || $session->userId == "") {
+                    if(($e->getRouteMatch()->getParam('controller') == 'Application\Controller\Activate')){
+                        if ($e->getRequest()->isXmlHttpRequest()) {
+                            return;
+                        }
+                    }else{
                         $url = $e->getRouter()->assemble(array(), array('name' => 'login'));
                         $response = $e->getResponse();
                         $response->getHeaders()->addHeaderLine('Location', $url);
@@ -59,6 +64,7 @@ class Module{
                         //Attach the "break" as a listener with a high priority
                         $e->getApplication()->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
                         return $response;
+                    }
                     }
             }else{
                 if ($e->getRequest()->isXmlHttpRequest()) {

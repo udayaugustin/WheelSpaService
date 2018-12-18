@@ -273,6 +273,7 @@ class VehicleTable extends AbstractTableGateway {
         foreach ($rResult as $aRow) {
 
             $row = array();
+            $row[] = $aRow['vehicle_id'];
             $row[] = $aRow['vehicle_no'];
             $row[] = ucwords($aRow['name']);
             $row[] = ucwords($aRow['vehicle_brand']);
@@ -328,6 +329,11 @@ class VehicleTable extends AbstractTableGateway {
         $queryStr = $sql->getSqlStringForSqlObject($query);
         $rResult=$dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $rResult;
+    }
+    
+    public function fetchVehicleDetailsByUserId($userId)
+    {
+        return $this->select(array('user_id'=>$userId))->toArray();
     }
 
     public function updateVehicleDetailsById($params)
