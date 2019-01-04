@@ -24,9 +24,7 @@ class CategoryHelper extends AbstractHelper implements ServiceLocatorAwareInterf
     
     public function __invoke()
     {
-        $sm = $this->getServiceLocator()->getServiceLocator();
-        $model = $sm->get("ProductCategoriesTable");
-        return $model->fetchAllActiveProductCategoryForMenu();
+        return 0;
     }
 }
 ?>

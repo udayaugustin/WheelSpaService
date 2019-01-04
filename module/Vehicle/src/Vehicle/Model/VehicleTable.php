@@ -79,16 +79,16 @@ class VehicleTable extends AbstractTableGateway {
             $queryStr = $sql->getSqlStringForSqlObject($query);
             $rResult=$dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
             if(isset($rResult->role_code) && $rResult->role_code =='admin'){
-                $vehicleQuery = $sql->select()->from(array('vd' => 'vehicle_details'))->columns(array('*'))
-                                ->join(array('ud'=>'user_details'),'ud.user_id=vd.user_id',array('name'));
+                $vehicleQuery = $sql->select()->from(array('vd' => 'vehicle_details'))->columns(array('VehicleId'=>'vehicle_id','UserId'=>'user_id','VehicleNo'=>'vehicle_no','VehicleName'=>'vehicle_name','VehicleBrand'=>'vehicle_brand','VehicleModel'=>'vehicle_model','VehicleType'=>'vehicle_type','VehicleVersion'=>'vehicle_version','YearOfPurchase'=>'year_of_purchase','KmDone'=>'km_done','AvgDrivePerWeek'=>'avg_drive_per_week'))
+                                ->join(array('ud'=>'user_details'),'ud.user_id=vd.user_id',array('Name'=>'name'));
                 $vehicleQueryStr = $sql->getSqlStringForSqlObject($vehicleQuery);
                 $vehicleResult=$dbAdapter->query($vehicleQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 
                 $response['status'] = 'success';
                 $response['VehicleDetails'] = $vehicleResult;
             }else if(isset($rResult->role_code) && $rResult->role_code =='user'){
-                $vehicleQuery = $sql->select()->from(array('vd' => 'vehicle_details'))->columns(array('*'))
-                                    ->join(array('ud'=>'user_details'),'ud.user_id=vd.user_id',array('name'))
+                $vehicleQuery = $sql->select()->from(array('vd' => 'vehicle_details'))->columns(array('VehicleId'=>'vehicle_id','UserId'=>'user_id','VehicleNo'=>'vehicle_no','VehicleName'=>'vehicle_name','VehicleBrand'=>'vehicle_brand','VehicleModel'=>'vehicle_model','VehicleType'=>'vehicle_type','VehicleVersion'=>'vehicle_version','YearOfPurchase'=>'year_of_purchase','KmDone'=>'km_done','AvgDrivePerWeek'=>'avg_drive_per_week'))
+                                    ->join(array('ud'=>'user_details'),'ud.user_id=vd.user_id',array('Name'=>'name'))
                                     ->where(array('ud.auth_token' => $params->AuthToken));
                 $vehicleQueryStr = $sql->getSqlStringForSqlObject($vehicleQuery);
                 $vehicleResult=$dbAdapter->query($vehicleQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();

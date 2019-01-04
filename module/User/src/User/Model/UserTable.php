@@ -145,21 +145,21 @@ class UserTable extends AbstractTableGateway {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         if(isset($params->AuthToken) && trim($params->AuthToken) != ""){
-            $userQuery = $sql->select()->from(array('ud' => 'user_details'))->columns(array('user_id','name','username','phone','user_dob','state','city','street_address','pincode','user_status'))
-                            ->join(array('r'=>'roles'),'ud.role_id=r.role_id',array('role_code'))
+            $userQuery = $sql->select()->from(array('ud' => 'user_details'))->columns(array('UserId'=>'user_id','Name'=>'name','Username'=>'username','Phone'=>'phone','User_Dob'=>'user_dob','State'=>'state','City'=>'city','StreetAddress'=>'street_address','Pincode'=>'pincode','UserStatus'=>'user_status'))
+                            ->join(array('r'=>'roles'),'ud.role_id=r.role_id',array('RoleCode'=>'role_code'))
                             ->where(array('ud.auth_token' => $params->AuthToken));
             $userQueryStr = $sql->getSqlStringForSqlObject($userQuery);
             $userResult=$dbAdapter->query($userQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
             
-            if(isset($userResult->role_code) && $userResult->role_code =='admin'){
-                $query = $sql->select()->from(array('ud' => 'user_details'))->columns(array('user_id','name','username','phone','user_dob','state','city','street_address','pincode','user_status'))
-                                ->join(array('r'=>'roles'),'ud.role_id=r.role_id',array('role_code'));
+            if(isset($userResult->RoleCode) && $userResult->RoleCode =='admin'){
+                $query = $sql->select()->from(array('ud' => 'user_details'))->columns(array('UserId'=>'user_id','Name'=>'name','Username'=>'username','Phone'=>'phone','User_Dob'=>'user_dob','State'=>'state','City'=>'city','StreetAddress'=>'street_address','Pincode'=>'pincode','UserStatus'=>'user_status'))
+                                ->join(array('r'=>'roles'),'ud.role_id=r.role_id',array('RoleCode'=>'role_code'));
                 $queryStr = $sql->getSqlStringForSqlObject($query);
                 $rResult=$dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 
                 $response['Status'] = 'success';
                 $response['UserDetails'] = $rResult;
-            }else if( isset($userResult->role_code) ){
+            }else if( isset($userResult->RoleCode) ){
                 $response['Status'] = 'success';
                 $response['UserDetails'] = $userResult;
             }else{

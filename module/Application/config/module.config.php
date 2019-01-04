@@ -161,7 +161,6 @@ return array(
      'view_helpers' => array(
           'invokables'=> array(
                'category_helper' => 'Application\View\Helper\CategoryHelper',
-
           )
      ),
      // Placeholder for console routes
