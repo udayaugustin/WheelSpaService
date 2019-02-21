@@ -27,51 +27,51 @@ class UserService {
     {
         $userDb = $this->sm->get('UserTable');
         $result = $userDb->addUserDetailsAPI($params);
-        if($params->LoginType != 'facebook' && $result['Status'] == 'success'){
-            $config = new \Zend\Config\Reader\Ini();
-            $configResult = $config->fromFile(CONFIG_PATH . '/custom.config.ini');
-            $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
-            $sql = new Sql($dbAdapter);
-            $uniqueId = $result['AuthToken'];
-            // Setup SMTP transport using LOGIN authentication
-            $transport = new SmtpTransport();
-            $options = new SmtpOptions(array(
-                'host' => $configResult["email"]["host"],
-                'port' => $configResult["email"]["config"]["port"],
-                'connection_class' => $configResult["email"]["config"]["auth"],
-                'connection_config' => array(
-                    'username' => $configResult["email"]["config"]["username"],
-                    'password' => $configResult["email"]["config"]["password"],
-                    'ssl' => $configResult["email"]["config"]["ssl"],
-                ),
-            ));
-            $domainUrl = $configResult['domain'];
-            $transport->setOptions($options);
-            $alertMail = new Mail\Message();
+        // if($params->LoginType != 'facebook' && $result['Status'] == 'success'){
+        //     $config = new \Zend\Config\Reader\Ini();
+        //     $configResult = $config->fromFile(CONFIG_PATH . '/custom.config.ini');
+        //     $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+        //     $sql = new Sql($dbAdapter);
+        //     $uniqueId = $result['AuthToken'];
+        //     // Setup SMTP transport using LOGIN authentication
+        //     $transport = new SmtpTransport();
+        //     $options = new SmtpOptions(array(
+        //         'host' => $configResult["email"]["host"],
+        //         'port' => $configResult["email"]["config"]["port"],
+        //         'connection_class' => $configResult["email"]["config"]["auth"],
+        //         'connection_config' => array(
+        //             'username' => $configResult["email"]["config"]["username"],
+        //             'password' => $configResult["email"]["config"]["password"],
+        //             'ssl' => $configResult["email"]["config"]["ssl"],
+        //         ),
+        //     ));
+        //     $domainUrl = $configResult['domain'];
+        //     $transport->setOptions($options);
+        //     $alertMail = new Mail\Message();
             
-            $userName = $params->UserName;
-            $name = $params->Name;
-            $fromEmail = 'thanaseelan.deforay@gmail.com';
-            $fromFullName = 'Wheelspa Service';
+        //     $userName = $params->UserName;
+        //     $name = $params->Name;
+        //     $fromEmail = 'thanaseelan.deforay@gmail.com';
+        //     $fromFullName = 'Wheelspa Service';
             
-            $link = "<a href='".$domainUrl."activate/user/".$uniqueId."'>".$domainUrl."activate/user/".$uniqueId."</a>";
-            $subject = 'Wheelspa Service User Activation';
-            $msg = "HI <b>$name</b>,<br><br>Thank you for registering for the Wheelspa Tyre Service Center. You are just a click away from activating your account. To activate your account please click here $link or copy and paste the URL in the browser.<br><br>Regards <br>Wheelspa Tyre Service Center";
-            $html = new MimePart($msg);
-            $html->type = "text/html";
-            $body = new MimeMessage();
-            $body->setParts(array($html));
+        //     $link = "<a href='".$domainUrl."activate/user/".$uniqueId."'>".$domainUrl."activate/user/".$uniqueId."</a>";
+        //     $subject = 'Wheelspa Service User Activation';
+        //     $msg = "HI <b>$name</b>,<br><br>Thank you for registering for the Wheelspa Tyre Service Center. You are just a click away from activating your account. To activate your account please click here $link or copy and paste the URL in the browser.<br><br>Regards <br>Wheelspa Tyre Service Center";
+        //     $html = new MimePart($msg);
+        //     $html->type = "text/html";
+        //     $body = new MimeMessage();
+        //     $body->setParts(array($html));
 
-            $alertMail->setBody($body);
-            $alertMail->addFrom($fromEmail, $fromFullName);
-            $alertMail->addReplyTo($fromEmail, $fromFullName);
-            $alertMail->addTo($userName);
-            // $alertMail->addCc($ccId);
-            // $alertMail->addBcc($bccId);
+        //     $alertMail->setBody($body);
+        //     $alertMail->addFrom($fromEmail, $fromFullName);
+        //     $alertMail->addReplyTo($fromEmail, $fromFullName);
+        //     $alertMail->addTo($userName);
+        //     // $alertMail->addCc($ccId);
+        //     // $alertMail->addBcc($bccId);
             
-            $alertMail->setSubject($subject);
-            $transport->send($alertMail);
-        }
+        //     $alertMail->setSubject($subject);
+        //     $transport->send($alertMail);
+        // }
         return $result;
     }
     public function userLoginInApi($params)

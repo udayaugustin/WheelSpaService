@@ -1,0 +1,118 @@
+<?php
+use Zend\Session\Container;
+$sessionLogin = new Container('credo');
+?>
+<div class="bg-body-light">
+     <div class="content content-full">
+          <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center">
+               <h1 class="flex-sm-fill font-size-h2 font-w400 mt-2 mb-0 mb-sm-2">Service</h1>
+               <nav class="flex-sm-00-auto ml-sm-3" aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                         <a href="<?php echo $this->url('admin', array('action' => 'service')); ?>"><li class="breadcrumb-item">Service Details</li></a>
+                         <li class="breadcrumb-item active" aria-current="page">&nbsp;/ Add</li>
+                    </ol>
+               </nav>
+          </div>
+     </div>
+</div>
+
+
+<div class="content">
+    <div class="block block-rounded block-bordered">
+        <div class="block-header block-header-default">
+            <h3 class="block-title">Add Service Details</h3>
+        </div>
+        <div class="block-content">
+            <div class="col-md-12 table-responsive" id="hide">
+                <form name="ServiceInformation" id="ServiceInformation"  class="mb-5" action="<?php echo $this->url('admin', array('action' => 'add-service')); ?>" method="post">
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label" for="serviceType">Service Type<span class="mandatory">*</span></label>
+                        <div class="col-sm-4">
+                            <select class="form-control isRequired" id="serviceType" name="serviceType" title="Please select the service type">
+                                <option value="">--Select--</option>
+                                <option value="tyre-service">Tyre Service</option>
+                                <option value="water-service">Water Service</option>
+                            </select>
+                        </div>
+
+                        <label class="col-sm-2 col-form-label" for="userId">Select Owner<span class="mandatory">*</span></label>
+                        <div class="col-sm-4">
+                            <select class="form-control isRequired" id="userId" name="userId" title="Please select the owner name">
+                                <option value="">--Select--</option>
+                                <?php foreach($userResult as $user){?>
+                                    <option value="<?php echo base64_encode($user['user_id']); ?>"><?php echo $user['name']; ?></option>
+                                <?php } ?>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label" for="serviceName">Service Name<span class="mandatory">*</span></label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control isRequired" id="serviceName" name="serviceName" placeholder="Enter the name" title="Please enter the name" onblur="checkNameValidation('service_detail', 'service_name', this,null, 'The service that you entered already exists . Please try another name..');">
+                        </div>
+                        
+                        <label class="col-sm-2 col-form-label" for="price">Service Price</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" id="price" name="price" placeholder="Enter the price" title="Please enter the price">
+                        </div>
+
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label" for="serviceStatus">Status<span class="mandatory">*</span></label>
+                        <div class="col-sm-4">
+                            <select class="form-control isRequired" id="serviceStatus" name="serviceStatus" title="Please select the service status">
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+
+                        <label class="col-sm-2 col-form-label" for="remarks">Comments</label>
+                        <div class="col-sm-4">
+                            <textarea class="form-control" id="remarks" rows="4" cols="50" name="remarks" placeholder="Enter the remarks" title="Please enter the remarks"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="row items-push">
+                        <div class="col-lg-7 offset-lg-4">
+                            <a href="<?php echo $this->url('admin', array('action' => 'service')); ?>" class="btn btn-danger">Cancel</a>&nbsp;
+                            <button type="submit" class="btn btn-primary" onclick="validateNow();return false;"><i class="fa fa-fw fa-check"></i> Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    duplicateName = true;
+    function validateNow() {
+        flag = deforayValidator.init({
+            formId: 'ServiceInformation'
+        });
+        if (flag) {
+            if (duplicateName) {
+                $.blockUI();
+                document.getElementById('ServiceInformation').submit();
+            }
+        }
+    }
+    function checkNameValidation(tableName, fieldName, obj, fnct, msg){
+        checkValue = document.getElementById(obj.id).value;
+        if($.trim(checkValue)!= ''){
+            $.post("<?php echo $this->url('common', array('action' => 'index')); ?>", { tableName: tableName, fieldName: fieldName, value: checkValue, fnct: fnct},
+            function(data) {
+                if (data > 0)
+                {
+                    alert(msg);
+                    duplicateName = false;
+                    document.getElementById(obj.id).value = "";
+                }
+                else {
+                    duplicateName = true;
+                }
+            });
+        }
+    }
+</script>

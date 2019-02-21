@@ -11,6 +11,7 @@ $tyreMenu = "";
 $tyreMenu.="<li id='nav-main-item'><a id='user' class='nav-main-link' href=". $this->url('admin', array('action' => 'user')) ."><span class='nav-main-link-name'>User Details</span></a></li>";
 $tyreMenu.="<li id='nav-main-item'><a id='vehicle' class='nav-main-link' href=". $this->url('admin', array('action' => 'vehicle')) ."><span class='nav-main-link-name'>Vehicle Details</span></a></li>";
 $tyreMenu.="<li id='nav-main-item'><a id='tyre' class='nav-main-link' href=". $this->url('admin', array('action' => 'tyre')) ."><span class='nav-main-link-name'>Tyre Details</span></a></li>";
+$tyreMenu.="<li id='nav-main-item'><a id='service' class='nav-main-link' href=". $this->url('admin', array('action' => 'service')) ."><span class='nav-main-link-name'>Service Details</span></a></li>";
 ?>
 
 <!doctype html>
@@ -251,6 +252,10 @@ $tyreMenu.="<li id='nav-main-item'><a id='tyre' class='nav-main-link' href=". $t
         }else if( splitsUrl[2] == 'tyre' || splitsUrl[2] == 'add-tyre' || splitsUrl[2] == 'edit-tyre' ){
           $('#manage').addClass('open');
           $('#tyre').addClass('active');
+        }
+        else if( splitsUrl[2] == 'service' || splitsUrl[2] == 'add-service' || splitsUrl[2] == 'edit-service' ){
+          $('#manage').addClass('open');
+          $('#service').addClass('active');
         }
         else{
           $('#'+splitsUrl[2]).addClass('active');

@@ -5,6 +5,7 @@ return array(
         'User',
         'Vehicle',
         'Tyre',
+        'Service',
     ),
     'module_listener_options' => array(
         'config_glob_paths'    => array(

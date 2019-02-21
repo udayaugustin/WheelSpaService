@@ -259,4 +259,73 @@ class AdminController extends AbstractActionController
             return $this->redirect()->toUrl("login");
         }
     }
+
+    public function serviceAction()
+    {
+        $session = new Container('credo');
+        if($session->roleCode == 'admin'){
+            $request = $this->getRequest();
+            if ($request->isPost()) {
+                $params = $request->getPost();
+                $serviceService = $this->getServiceLocator()->get('ServiceService');
+                $result = $serviceService->getServiceDetails($params);
+                return $this->getResponse()->setContent(Json::encode($result));
+            }
+        }else{
+            return $this->redirect()->toUrl("login");
+        }
+    }
+
+    public function addServiceAction()
+    {
+        $session = new Container('credo');
+        if($session->roleCode == 'admin'){
+            $request = $this->getRequest();
+            $userService = $this->getServiceLocator()->get('UserService');
+            $serviceService = $this->getServiceLocator()->get('ServiceService');
+            if ($request->isPost()) {
+                $params = $request->getPost();
+                $serviceService->addService($params);
+                return $this->redirect()->toUrl("/admin/service");
+            }else{
+                $userResult=$userService->getAllUsers();
+                return new ViewModel(array(
+                    'userResult' => $userResult,
+                ));
+            }
+        }else{
+            return $this->redirect()->toUrl("login");
+        }
+    }
+
+    public function editServiceAction()
+    {
+        $session = new Container('credo');
+        if($session->roleCode == 'admin'){
+            $userService = $this->getServiceLocator()->get('UserService');
+            $serviceService = $this->getServiceLocator()->get('ServiceService');
+            if($this->getRequest()->isPost())
+            {
+                $params=$this->getRequest()->getPost();
+                $serviceService->updateServiceDetails($params);
+                return $this->redirect()->toUrl('/admin/service');
+            }
+            else
+            {
+                $serviceId=base64_decode( $this->params()->fromRoute('id') );
+                if($serviceId!=''){
+                    $userResult=$userService->getAllUsers();
+                    $result=$serviceService->getServiceDetailsById($serviceId);
+                    return new ViewModel(array(
+                        'userResult' => $userResult,
+                        'result' => $result,
+                    ));
+                }else{
+                    return $this->redirect()->toUrl("/admin/service");
+                }
+            }
+        }else{
+            return $this->redirect()->toUrl("login");
+        }
+    }
 }

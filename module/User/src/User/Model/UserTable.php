@@ -84,6 +84,7 @@ class UserTable extends AbstractTableGateway {
                     'password' => $password,    
                     'phone' => $params->Mobile,
                     'auth_token' => $authToken,
+                    'user_status' => 'active',
                 );
                 if(isset($params->Dob) && trim($params->Dob) != ""){
                     $data['user_dob'] = $common->dbDateFormat($params->Dob);
@@ -103,17 +104,17 @@ class UserTable extends AbstractTableGateway {
                 if(isset($params->Pincode) && trim($params->Pincode) != ""){
                     $data['pincode'] = $params->Pincode;
                 }
-                if(isset($params->LoginType) && trim($params->LoginType) != ""){
-                    if($params->LoginType == 'facebook'){
-                        $data['user_status'] = 'active';
-                    }
-                }
+                // if(isset($params->LoginType) && trim($params->LoginType) != ""){
+                //     if($params->LoginType == 'facebook'){
+                //         $data['user_status'] = 'active';
+                //     }
+                // }
                 $this->insert($data);
                 $lastInsertedId = $this->lastInsertValue;
                 $result = $this->select(array('user_id'=>$lastInsertedId))->current();
                 if($lastInsertedId > 0){
                     $response['Status'] = 'success';
-                    if($params->LoginType == 'facebook'){
+                    // if($params->LoginType == 'facebook'){
                         if($result->role_id == 1){
                             $roleCode = 'Admin';
                         }else{
@@ -125,9 +126,9 @@ class UserTable extends AbstractTableGateway {
                             'RoleCode' => $roleCode,                                        
                             'AuthToken' => $authToken,                                        
                         );
-                    }else{
-                        $response['AuthToken']= $authToken;
-                    }
+                    // }else{
+                        // $response['AuthToken']= $authToken;
+                    // }
                     $response['Message'] ='succesffuly registered';
                 }else{
                     $response['Status'] = 'failed';
